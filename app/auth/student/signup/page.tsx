@@ -61,7 +61,7 @@ export default function StudentSignUp() {
 
       showToast('Student account created successfully!', 'success');
       setTimeout(() => router.push('/auth/student/signin'), 1500);
-    } catch (error) {
+    } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);
     }

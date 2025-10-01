@@ -71,7 +71,7 @@ export default function StaffSignUp() {
 
       showToast('Staff account created successfully!', 'success');
       setTimeout(() => router.push('/auth/staff/signin'), 1500);
-    } catch (error) {
+    } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);
     }

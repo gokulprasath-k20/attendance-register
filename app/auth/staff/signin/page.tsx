@@ -43,7 +43,7 @@ export default function StaffSignIn() {
 
       showToast('Signed in successfully!', 'success');
       router.push('/staff');
-    } catch (error) {
+    } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ export default function StaffSignIn() {
 
         <div className="mt-6 text-center space-y-2">
           <p className="text-gray-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/staff/signup" className="text-indigo-600 hover:text-indigo-700 font-medium">
               Register
             </Link>
