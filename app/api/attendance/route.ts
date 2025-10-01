@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
       .from('attendance')
       .select(`
         *,
-        profiles:student_id (
+        profiles!student_id (
           name,
           email,
           reg_no,
           year,
           semester
         ),
-        otp_sessions:otp_session_id (
+        otp_sessions!otp_session_id (
           subject,
           year,
           semester,
