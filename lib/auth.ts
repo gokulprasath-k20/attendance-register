@@ -32,7 +32,11 @@ export const authOptions: NextAuthOptions = {
 
         if (authError) {
           console.error('Supabase auth error:', authError);
-          throw new Error(`Invalid credentials: ${authError.message}`);
+          // Check if email confirmation is required
+          if (authError.message.includes('Email not confirmed')) {
+            throw new Error('Please confirm your email before signing in');
+          }
+          throw new Error('Invalid email or password');
         }
 
         if (!authData.user) {

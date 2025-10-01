@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
       email,
       password,
       options: {
+        emailRedirectTo: undefined, // Disable email confirmation
         data: {
           name,
           role,
