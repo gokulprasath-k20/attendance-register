@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { createSupabaseAdmin } from '@/lib/supabase/client';
 
 export async function POST(request: NextRequest) {
@@ -22,15 +23,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createSupabaseAdmin();
-
     console.log('Creating user with email:', email, 'role:', role);
 
-    // Create user in Supabase Auth with admin API
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Use anon key for signup
+    const supabaseAnon = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    // Create user with anon key
+    const { data: authData, error: authError } = await supabaseAnon.auth.signUp({
       email,
       password,
-      email_confirm: true, // Auto-confirm email for signup
+      options: {
+        data: {
+          name,
+          role,
+        }
+      }
     });
 
     if (authError || !authData.user) {
@@ -43,8 +53,11 @@ export async function POST(request: NextRequest) {
 
     console.log('User created successfully, creating profile...');
 
+    // Use admin client for profile creation (bypass RLS)
+    const supabaseAdmin = createSupabaseAdmin();
+
     // Create profile
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await supabaseAdmin.from('profiles').insert({
       user_id: authData.user.id,
       email,
       name,
