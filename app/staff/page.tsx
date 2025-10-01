@@ -11,6 +11,20 @@ import { getRemainingTime, formatRemainingTime } from '@/lib/utils/otp';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
 
+interface AttendanceRecord {
+  id: string;
+  created_at: string;
+  status: string;
+  distance_meters: number;
+  profiles?: {
+    name: string;
+    reg_no: string;
+  };
+  otp_sessions?: {
+    subject: string;
+  };
+}
+
 export default function StaffDashboard() {
   const { data: session } = useSession();
   const [formData, setFormData] = useState({
@@ -32,7 +46,7 @@ export default function StaffDashboard() {
   });
 
   const generateOTPMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: { latitude: number; longitude: number; subject: string; year: string; semester: string }) => {
       const response = await fetch('/api/otp/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,7 +63,7 @@ export default function StaffDashboard() {
       setOtpExpiry(data.otpSession.expires_at);
       showToast('OTP Generated Successfully!', 'success');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       setGeneratedOTP(null);
       setOtpExpiry(null);
       showToast(error.message || 'Failed to generate OTP', 'error');
@@ -69,8 +83,8 @@ export default function StaffDashboard() {
         year: formData.year,
         semester: formData.semester,
       });
-    } catch (error: any) {
-      showToast(error.message || 'Failed to get location', 'error');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Failed to get location', 'error');
     }
   };
 
@@ -93,7 +107,7 @@ export default function StaffDashboard() {
   const handleExportPDF = () => {
     if (!attendanceData?.attendance) return;
 
-    const records = attendanceData.attendance.map((record: any) => ({
+    const records = attendanceData.attendance.map((record: AttendanceRecord) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',

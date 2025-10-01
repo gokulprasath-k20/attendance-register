@@ -58,14 +58,24 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Profile not found');
         }
 
+        const profileData = profile as {
+          user_id: string;
+          email: string;
+          name: string;
+          role: string;
+          reg_no: string | null;
+          year: number | null;
+          semester: number | null;
+        };
+
         return {
-          id: (profile as any).user_id,
-          email: (profile as any).email,
-          name: (profile as any).name,
-          role: (profile as any).role,
-          regNo: (profile as any).reg_no,
-          year: (profile as any).year,
-          semester: (profile as any).semester,
+          id: profileData.user_id,
+          email: profileData.email,
+          name: profileData.name,
+          role: profileData.role,
+          regNo: profileData.reg_no,
+          year: profileData.year,
+          semester: profileData.semester,
         };
       },
     }),

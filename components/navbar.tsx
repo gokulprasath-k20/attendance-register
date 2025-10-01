@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import { NAVIGATION_MENU, USER_ROLES } from '@/config/app.config';
+import { NAVIGATION_MENU } from '@/config/app.config';
 
 export default function Navbar() {
   const { data: session } = useSession();
