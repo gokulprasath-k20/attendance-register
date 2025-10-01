@@ -24,6 +24,8 @@ export async function POST(request: NextRequest) {
 
     const supabase = createSupabaseAdmin();
 
+    console.log('Creating user with email:', email, 'role:', role);
+
     // Create user in Supabase Auth with admin API
     const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email,
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    console.log('User created successfully, creating profile...');
 
     // Create profile
     const { error: profileError } = await supabase.from('profiles').insert({
