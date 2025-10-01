@@ -54,7 +54,7 @@ export default function AdminSignUp() {
 
       showToast('Admin account created successfully!', 'success');
       setTimeout(() => router.push('/auth/admin/signin'), 1500);
-    } catch (error) {
+    } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);
     }
