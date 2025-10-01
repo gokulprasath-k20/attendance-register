@@ -25,10 +25,19 @@ export async function POST(request: NextRequest) {
 
     console.log('Creating user with email:', email, 'role:', role);
 
+    // Verify env vars
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      console.error('Missing Supabase environment variables');
+      return NextResponse.json(
+        { error: 'Server configuration error - missing Supabase credentials' },
+        { status: 500 }
+      );
+    }
+
     // Use anon key for signup
     const supabaseAnon = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
     // Create user with anon key
@@ -82,8 +91,9 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Signup error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: `Server error: ${errorMessage}` },
       { status: 500 }
     );
   }
