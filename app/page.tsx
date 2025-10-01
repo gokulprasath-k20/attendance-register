@@ -15,10 +15,10 @@ export default function Home() {
       // Redirect to appropriate dashboard
       switch (session.user.role) {
         case 'admin':
-          router.push('/admin');
+          router.push('/admin/dashboard');
           break;
         case 'staff':
-          router.push('/staff');
+          router.push('/staff/dashboard');
           break;
         case 'student':
           router.push('/student');

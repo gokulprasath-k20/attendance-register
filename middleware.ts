@@ -7,11 +7,11 @@ export default withAuth(
     const path = req.nextUrl.pathname;
 
     // Check role-based access
-    if (path.startsWith('/admin') && token?.role !== 'admin') {
+    if (path.startsWith('/admin/dashboard') && token?.role !== 'admin') {
       return NextResponse.redirect(new URL('/', req.url));
     }
 
-    if (path.startsWith('/staff') && token?.role !== 'staff') {
+    if (path.startsWith('/staff/dashboard') && token?.role !== 'staff') {
       return NextResponse.redirect(new URL('/', req.url));
     }
 
@@ -29,5 +29,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/admin/:path*', '/staff/:path*', '/student/:path*'],
+  matcher: ['/admin/dashboard/:path*', '/staff/dashboard/:path*', '/student/:path*'],
 };

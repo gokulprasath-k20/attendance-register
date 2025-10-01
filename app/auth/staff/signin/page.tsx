@@ -42,7 +42,7 @@ export default function StaffSignIn() {
       }
 
       showToast('Signed in successfully!', 'success');
-      router.push('/staff');
+      router.push('/staff/dashboard');
     } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);

@@ -43,7 +43,7 @@ export default function AdminSignIn() {
       }
 
       showToast('Signed in successfully!', 'success');
-      router.push('/admin');
+      router.push('/admin/dashboard');
     } catch {
       showToast('An error occurred', 'error');
       setIsLoading(false);
