@@ -58,12 +58,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate distance
+    console.log('Student coords:', latitude, longitude);
+    console.log('Staff coords:', otpSession.admin_lat, otpSession.admin_lng);
+    
     const distance = calculateDistance(
       latitude,
       longitude,
       otpSession.admin_lat,
       otpSession.admin_lng
     );
+    
+    console.log('Calculated distance:', distance, 'meters');
 
     // Determine status
     const status =
