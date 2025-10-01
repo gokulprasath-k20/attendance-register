@@ -57,65 +57,23 @@ export default function Home() {
           </p>
 
           <div className="text-center mb-8">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Choose Your Role</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {/* Admin Card */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all border-2 border-purple-200 hover:border-purple-400">
-                <div className="text-5xl mb-3">👨‍💼</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Admin</h4>
-                <p className="text-gray-600 text-sm mb-4">View & manage attendance</p>
-                <div className="space-y-2">
-                  <Link
-                    href="/auth/admin/signin"
-                    className="block w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/admin/signup"
-                    className="block w-full bg-white text-purple-600 px-4 py-2 rounded-lg font-medium border-2 border-purple-600 hover:bg-purple-50 transition-all"
-                  >
-                    Register
-                  </Link>
-                </div>
-              </div>
-
-              {/* Staff Card */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all border-2 border-indigo-200 hover:border-indigo-400">
-                <div className="text-5xl mb-3">👨‍🏫</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Staff</h4>
-                <p className="text-gray-600 text-sm mb-4">Generate OTPs & view records</p>
-                <div className="space-y-2">
-                  <Link
-                    href="/auth/staff/signin"
-                    className="block w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:from-indigo-700 hover:to-blue-700 transition-all"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/auth/staff/signup"
-                    className="block w-full bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium border-2 border-indigo-600 hover:bg-indigo-50 transition-all"
-                  >
-                    Register
-                  </Link>
-                </div>
-              </div>
-
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Student Portal</h3>
+            <div className="max-w-md mx-auto">
               {/* Student Card */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all border-2 border-teal-200 hover:border-teal-400">
-                <div className="text-5xl mb-3">🎓</div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">Student</h4>
-                <p className="text-gray-600 text-sm mb-4">Mark attendance & view history</p>
-                <div className="space-y-2">
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all border-2 border-teal-200 hover:border-teal-400">
+                <div className="text-6xl mb-4">🎓</div>
+                <h4 className="text-2xl font-bold text-gray-900 mb-3">Student</h4>
+                <p className="text-gray-600 mb-6">Mark attendance & view history</p>
+                <div className="space-y-3">
                   <Link
                     href="/auth/student/signin"
-                    className="block w-full bg-gradient-to-r from-teal-600 to-green-600 text-white px-4 py-2 rounded-lg font-medium hover:from-teal-700 hover:to-green-700 transition-all"
+                    className="block w-full bg-gradient-to-r from-teal-600 to-green-600 text-white px-6 py-3 rounded-lg font-medium hover:from-teal-700 hover:to-green-700 transition-all"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth/student/signup"
-                    className="block w-full bg-white text-teal-600 px-4 py-2 rounded-lg font-medium border-2 border-teal-600 hover:bg-teal-50 transition-all"
+                    className="block w-full bg-white text-teal-600 px-6 py-3 rounded-lg font-medium border-2 border-teal-600 hover:bg-teal-50 transition-all"
                   >
                     Register
                   </Link>
@@ -157,39 +115,27 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Roles Section */}
+          {/* Student Features */}
           <div className="mt-16 bg-white rounded-xl shadow-2xl p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">
-              Three User Roles
+              Student Features
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg">
-                <h3 className="text-xl font-bold text-purple-700 mb-2">Admin</h3>
-                <ul className="text-gray-700 space-y-1 text-left">
-                  <li>• Generate OTPs</li>
-                  <li>• View all attendance</li>
-                  <li>• Manage users</li>
-                  <li>• Export reports</li>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              <div className="p-6 bg-gradient-to-br from-teal-50 to-green-50 rounded-lg">
+                <h3 className="text-xl font-bold text-teal-700 mb-3">📱 Easy Attendance</h3>
+                <ul className="text-gray-700 space-y-2 text-left">
+                  <li>• Mark attendance with OTP</li>
+                  <li>• GPS-based verification</li>
+                  <li>• Real-time status updates</li>
                 </ul>
               </div>
 
-              <div className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg">
-                <h3 className="text-xl font-bold text-indigo-700 mb-2">Staff</h3>
-                <ul className="text-gray-700 space-y-1 text-left">
-                  <li>• Generate OTPs</li>
-                  <li>• View student attendance</li>
-                  <li>• Export reports</li>
-                  <li>• Track sessions</li>
-                </ul>
-              </div>
-
-              <div className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg">
-                <h3 className="text-xl font-bold text-pink-700 mb-2">Student</h3>
-                <ul className="text-gray-700 space-y-1 text-left">
-                  <li>• Mark attendance</li>
-                  <li>• Enter OTP codes</li>
+              <div className="p-6 bg-gradient-to-br from-teal-50 to-green-50 rounded-lg">
+                <h3 className="text-xl font-bold text-teal-700 mb-3">📊 Track Progress</h3>
+                <ul className="text-gray-700 space-y-2 text-left">
                   <li>• View attendance history</li>
-                  <li>• Check status</li>
+                  <li>• Check attendance status</li>
+                  <li>• Monitor your records</li>
                 </ul>
               </div>
             </div>
