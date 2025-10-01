@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -10,7 +9,6 @@ import { getCurrentLocation } from '@/lib/utils/geolocation';
 import { formatDistance } from '@/lib/utils/geolocation';
 
 export default function StudentDashboard() {
-  const { data: session } = useSession();
   const [otpCode, setOtpCode] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast, showToast, closeToast } = useToast();
@@ -55,8 +53,8 @@ export default function StudentDashboard() {
         setOtpCode('');
         refetch();
       }
-    } catch (error: any) {
-      showToast(error.message || 'An error occurred', 'error');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'An error occurred', 'error');
     } finally {
       setLoading(false);
     }
@@ -132,7 +130,7 @@ export default function StudentDashboard() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {attendanceData.attendance.map((record: any) => (
+                    {attendanceData.attendance.map((record: { id: string; created_at: string; status: string; distance_meters: number; otp_sessions?: { subject: string } }) => (
                       <tr key={record.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.created_at).toLocaleDateString()}

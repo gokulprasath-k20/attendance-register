@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { getCurrentLocation } from '@/lib/utils/geolocation';
-import { getRemainingTime, formatRemainingTime } from '@/lib/utils/otp';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
 
@@ -26,7 +24,6 @@ interface AttendanceRecord {
 }
 
 export default function StaffDashboard() {
-  const { data: session } = useSession();
   const [formData, setFormData] = useState({
     subject: '',
     year: '',
@@ -36,7 +33,7 @@ export default function StaffDashboard() {
   const [otpExpiry, setOtpExpiry] = useState<string | null>(null);
   const { toast, showToast, closeToast } = useToast();
 
-  const { data: attendanceData, refetch: refetchAttendance } = useQuery({
+  const { data: attendanceData } = useQuery({
     queryKey: ['staff-attendance'],
     queryFn: async () => {
       const response = await fetch('/api/attendance');
@@ -91,7 +88,7 @@ export default function StaffDashboard() {
   const handleExportExcel = () => {
     if (!attendanceData?.attendance) return;
 
-    const records = attendanceData.attendance.map((record: any) => ({
+    const records = attendanceData.attendance.map((record: AttendanceRecord) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
@@ -298,7 +295,7 @@ export default function StaffDashboard() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {attendanceData.attendance.map((record: any) => (
+                    {attendanceData.attendance.map((record: AttendanceRecord) => (
                       <tr key={record.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.profiles?.name}
