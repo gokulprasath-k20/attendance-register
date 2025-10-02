@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { createSupabaseAdmin } from '@/lib/supabase/client';
+import { createSupabaseAdmin, Database } from '@/lib/supabase/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,8 +30,10 @@ export async function POST(request: NextRequest) {
 
     const supabase = createSupabaseAdmin();
 
-    // Prepare update data
-    const updateData: any = { role: newRole };
+    // Prepare update data with proper Supabase typing
+    const updateData: Database['public']['Tables']['profiles']['Update'] = { 
+      role: newRole as 'admin' | 'staff' | 'student'
+    };
     
     // Add student-specific fields if role is student
     if (newRole === 'student') {
@@ -41,9 +43,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Update user profile
-    const { data: updatedProfile, error: updateError } = await supabase
-      .from('profiles')
-      .update(updateData as any)
+    const { data: updatedProfile, error: updateError } = await (supabase
+      .from('profiles') as any)
+      .update(updateData)
       .eq('email', email)
       .select()
       .single();
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    const profileData = updatedProfile as any;
+    const profileData = updatedProfile as Database['public']['Tables']['profiles']['Row'];
 
     return NextResponse.json({
       message: 'User role updated successfully',
