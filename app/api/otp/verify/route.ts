@@ -99,8 +99,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate distance
-    console.log('Student coords:', latitude, longitude);
-    console.log('Staff coords:', session_data.admin_lat, session_data.admin_lng);
+    console.log('=== DISTANCE CALCULATION DEBUG ===');
+    console.log('Student coords:', { lat: latitude, lng: longitude });
+    console.log('Staff coords:', { lat: session_data.admin_lat, lng: session_data.admin_lng });
     
     const distance = calculateDistance(
       latitude,
@@ -110,6 +111,9 @@ export async function POST(request: NextRequest) {
     );
     
     console.log('Calculated distance:', distance, 'meters');
+    console.log('Max allowed distance:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('Distance in km:', (distance / 1000).toFixed(2), 'km');
+    console.log('=== END DEBUG ===');
 
     // Determine status
     const status =
