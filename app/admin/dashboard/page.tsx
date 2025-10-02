@@ -1,14 +1,66 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
+import { getAllSubjects } from '@/lib/utils/subjects';
 
 export default function AdminDashboard() {
   const { toast, showToast, closeToast } = useToast();
+  
+  // Filter state management
+  const [historyFilters, setHistoryFilters] = useState({
+    subject: '',
+    status: '',
+    studentName: '',
+    regNo: '',
+    year: '',
+    semester: '',
+    startDate: '',
+    endDate: '',
+  });
+  
+  const [tempFilters, setTempFilters] = useState({
+    subject: '',
+    status: '',
+    studentName: '',
+    regNo: '',
+    year: '',
+    semester: '',
+    startDate: '',
+    endDate: '',
+  });
+
+  const applyFilters = () => {
+    setHistoryFilters(tempFilters);
+  };
+
+  const clearFilters = () => {
+    setTempFilters({
+      subject: '',
+      status: '',
+      studentName: '',
+      regNo: '',
+      year: '',
+      semester: '',
+      startDate: '',
+      endDate: '',
+    });
+    setHistoryFilters({
+      subject: '',
+      status: '',
+      studentName: '',
+      regNo: '',
+      year: '',
+      semester: '',
+      startDate: '',
+      endDate: '',
+    });
+  };
 
   const { data: attendanceData, refetch } = useQuery({
     queryKey: ['admin-attendance'],
@@ -89,6 +141,141 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Advanced Filters */}
+            <div className="p-4 bg-gray-50 rounded-lg mb-4">
+              <h3 className="text-sm font-semibold text-gray-800 mb-3">Filter Records</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Subject
+                  </label>
+                  <select
+                    value={tempFilters.subject}
+                    onChange={(e) => setTempFilters({ ...tempFilters, subject: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  >
+                    <option value="">All Subjects</option>
+                    {getAllSubjects().map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={tempFilters.status}
+                    onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  >
+                    <option value="">All Status</option>
+                    <option value="P">Present Only</option>
+                    <option value="A">Absent Only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Student Name
+                  </label>
+                  <input
+                    type="text"
+                    value={tempFilters.studentName}
+                    onChange={(e) => setTempFilters({ ...tempFilters, studentName: e.target.value })}
+                    placeholder="Search by name..."
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Reg No
+                  </label>
+                  <input
+                    type="text"
+                    value={tempFilters.regNo}
+                    onChange={(e) => setTempFilters({ ...tempFilters, regNo: e.target.value })}
+                    placeholder="Search by reg no..."
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Year
+                  </label>
+                  <select
+                    value={tempFilters.year}
+                    onChange={(e) => setTempFilters({ ...tempFilters, year: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  >
+                    <option value="">All Years</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Semester
+                  </label>
+                  <select
+                    value={tempFilters.semester}
+                    onChange={(e) => setTempFilters({ ...tempFilters, semester: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  >
+                    <option value="">All Semesters</option>
+                    <option value="1">Semester 1</option>
+                    <option value="2">Semester 2</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.startDate}
+                    onChange={(e) => setTempFilters({ ...tempFilters, startDate: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.endDate}
+                    onChange={(e) => setTempFilters({ ...tempFilters, endDate: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={applyFilters}
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
+                >
+                  Apply Filters
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            </div>
+
             {!attendanceData ? (
               <AttendanceTableSkeleton rows={10} />
             ) : (
@@ -120,7 +307,20 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {attendanceData.attendance.map((record: any) => (
+                    {attendanceData.attendance
+                      .filter((record: any) => {
+                        // Apply filters
+                        if (historyFilters.subject && record.otp_sessions?.subject !== historyFilters.subject) return false;
+                        if (historyFilters.status && record.status !== historyFilters.status) return false;
+                        if (historyFilters.studentName && !record.profiles?.name?.toLowerCase().includes(historyFilters.studentName.toLowerCase())) return false;
+                        if (historyFilters.regNo && !record.profiles?.reg_no?.toLowerCase().includes(historyFilters.regNo.toLowerCase())) return false;
+                        if (historyFilters.year && record.profiles?.year?.toString() !== historyFilters.year) return false;
+                        if (historyFilters.semester && record.profiles?.semester?.toString() !== historyFilters.semester) return false;
+                        if (historyFilters.startDate && new Date(record.created_at) < new Date(historyFilters.startDate)) return false;
+                        if (historyFilters.endDate && new Date(record.created_at) > new Date(historyFilters.endDate)) return false;
+                        return true;
+                      })
+                      .map((record: any) => (
                       <tr key={record.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.profiles?.name}
