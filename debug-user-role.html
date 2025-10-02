@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug User Role - Attendance Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #8B44F7;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #7c3aed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug User Role - Attendance Register</h1>
+        <p>Use this tool to check what role a user has in the database and optionally update it.</p>
+        
+        <div class="form-group">
+            <label for="email">User Email:</label>
+            <input type="email" id="email" placeholder="twisha@gmail.com" value="twisha@gmail.com">
+        </div>
+        
+        <button onclick="checkUserRole()">Check User Role</button>
+        
+        <div id="result"></div>
+        
+        <hr style="margin: 30px 0;">
+        
+        <h2>🛠️ Update User Role (Admin Only)</h2>
+        <div class="form-group">
+            <label for="updateEmail">User Email:</label>
+            <input type="email" id="updateEmail" placeholder="twisha@gmail.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="newRole">New Role:</label>
+            <select id="newRole">
+                <option value="student">Student</option>
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        
+        <div id="studentFields" style="display: none;">
+            <div class="form-group">
+                <label for="regNo">Registration Number:</label>
+                <input type="text" id="regNo" placeholder="2024001">
+            </div>
+            
+            <div class="form-group">
+                <label for="year">Year:</label>
+                <select id="year">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="semester">Semester:</label>
+                <select id="semester">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+        </div>
+        
+        <button onclick="updateUserRole()">Update User Role</button>
+        
+        <div id="updateResult"></div>
+        
+        <hr style="margin: 30px 0;">
+        
+        <div class="warning">
+            <h3>⚠️ Instructions:</h3>
+            <ol>
+                <li><strong>Check User Role:</strong> Enter the email and click "Check User Role" to see what role the user currently has.</li>
+                <li><strong>Fix the Issue:</strong> If the user has the wrong role, use the "Update User Role" section to correct it.</li>
+                <li><strong>For Students:</strong> When setting role to "student", make sure to fill in registration number, year, and semester.</li>
+                <li><strong>Admin Access:</strong> Only admin users can update roles. Make sure you're signed in as an admin first.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide student fields based on role selection
+        document.getElementById('newRole').addEventListener('change', function() {
+            const studentFields = document.getElementById('studentFields');
+            if (this.value === 'student') {
+                studentFields.style.display = 'block';
+            } else {
+                studentFields.style.display = 'none';
+            }
+        });
+
+        async function checkUserRole() {
+            const email = document.getElementById('email').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!email) {
+                resultDiv.innerHTML = '<div class="error">Please enter an email address.</div>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/debug/user-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ User Found:</strong><br>
+                            Email: ${data.email}<br>
+                            Name: ${data.name}<br>
+                            <strong>Role: ${data.role}</strong><br>
+                            ${data.regNo ? `Registration No: ${data.regNo}<br>` : ''}
+                            ${data.year ? `Year: ${data.year}<br>` : ''}
+                            ${data.semester ? `Semester: ${data.semester}<br>` : ''}
+                            Created: ${new Date(data.created_at).toLocaleString()}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>❌ Error:</strong><br>${data.error}${data.details ? '<br>' + data.details : ''}${data.suggestion ? '<br><br><strong>Suggestion:</strong> ' + data.suggestion : ''}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><strong>❌ Network Error:</strong><br>${error.message}</div>`;
+            }
+        }
+        
+        async function updateUserRole() {
+            const email = document.getElementById('updateEmail').value;
+            const newRole = document.getElementById('newRole').value;
+            const regNo = document.getElementById('regNo').value;
+            const year = document.getElementById('year').value;
+            const semester = document.getElementById('semester').value;
+            const resultDiv = document.getElementById('updateResult');
+            
+            if (!email || !newRole) {
+                resultDiv.innerHTML = '<div class="error">Please enter email and select a role.</div>';
+                return;
+            }
+            
+            const requestBody = { email, newRole };
+            
+            if (newRole === 'student') {
+                if (regNo) requestBody.regNo = regNo;
+                if (year) requestBody.year = parseInt(year);
+                if (semester) requestBody.semester = parseInt(semester);
+            }
+            
+            try {
+                const response = await fetch('/api/admin/update-user-role', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ ${data.message}</strong><br>
+                            Email: ${data.user.email}<br>
+                            Name: ${data.user.name}<br>
+                            <strong>New Role: ${data.user.role}</strong><br>
+                            ${data.user.regNo ? `Registration No: ${data.user.regNo}<br>` : ''}
+                            ${data.user.year ? `Year: ${data.user.year}<br>` : ''}
+                            ${data.user.semester ? `Semester: ${data.user.semester}<br>` : ''}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>❌ Error:</strong><br>${data.error}${data.details ? '<br>' + data.details : ''}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error"><strong>❌ Network Error:</strong><br>${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

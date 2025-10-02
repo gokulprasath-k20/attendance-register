@@ -36,7 +36,8 @@ export default function StaffSignIn() {
       const session = await response.json();
       
       if (session?.user?.role !== 'staff') {
-        showToast('Access denied. Staff credentials required.', 'error');
+        const userRole = session?.user?.role || 'unknown';
+        showToast(`Access denied. This account is registered as '${userRole}'. Please use the correct signin page or contact admin if this is incorrect.`, 'error');
         await signOut({ redirect: false }); // Sign out
         setIsLoading(false);
         return;
