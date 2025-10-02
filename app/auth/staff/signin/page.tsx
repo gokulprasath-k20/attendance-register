@@ -32,7 +32,13 @@ export default function StaffSignIn() {
       }
 
       // Verify staff role after signin
-      const response = await fetch('/api/auth/session');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch('/api/auth/session', {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       const session = await response.json();
       
       if (session?.user?.role !== 'staff') {
@@ -45,8 +51,12 @@ export default function StaffSignIn() {
 
       showToast('Signed in successfully!', 'success');
       router.push('/staff/dashboard');
-    } catch {
-      showToast('An error occurred', 'error');
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        showToast('Request timed out. Please try again.', 'error');
+      } else {
+        showToast('An error occurred', 'error');
+      }
       setIsLoading(false);
     }
   };

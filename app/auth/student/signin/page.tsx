@@ -32,7 +32,13 @@ export default function StudentSignIn() {
       }
 
       // Verify student role after signin
-      const response = await fetch('/api/auth/session');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch('/api/auth/session', {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
       const session = await response.json();
       
       if (session?.user?.role !== 'student') {
@@ -45,8 +51,12 @@ export default function StudentSignIn() {
 
       showToast('Signed in successfully!', 'success');
       router.push('/student');
-    } catch {
-      showToast('An error occurred', 'error');
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        showToast('Request timed out. Please try again.', 'error');
+      } else {
+        showToast('An error occurred', 'error');
+      }
       setIsLoading(false);
     }
   };
