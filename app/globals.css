@@ -1,41 +1,19 @@
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-:root {
-  --lavender-50: #f5f3ff;
-  --lavender-100: #ede9fe;
-  --lavender-200: #ddd6fe;
-  --lavender-300: #c4b5fd;
-  --lavender-400: #a78bfa;
-  --lavender-500: #8B44F7;
-  --lavender-600: #7c3aed;
-  --lavender-700: #6d28d9;
-  --lavender-800: #5b21b6;
-  --lavender-900: #4c1d95;
-}
-
-@theme inline {
-  --color-lavender-50: var(--lavender-50);
-  --color-lavender-100: var(--lavender-100);
-  --color-lavender-200: var(--lavender-200);
-  --color-lavender-300: var(--lavender-300);
-  --color-lavender-400: var(--lavender-400);
-  --color-lavender-500: var(--lavender-500);
-  --color-lavender-600: var(--lavender-600);
-  --color-lavender-700: var(--lavender-700);
-  --color-lavender-800: var(--lavender-800);
-  --color-lavender-900: var(--lavender-900);
-  
-  --animate-slide-in: slide-in 0.3s ease-out;
-  
-  @keyframes slide-in {
-    from {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+@layer base {
+  :root {
+    --lavender-50: #f5f3ff;
+    --lavender-100: #ede9fe;
+    --lavender-200: #ddd6fe;
+    --lavender-300: #c4b5fd;
+    --lavender-400: #a78bfa;
+    --lavender-500: #8B44F7;
+    --lavender-600: #7c3aed;
+    --lavender-700: #6d28d9;
+    --lavender-800: #5b21b6;
+    --lavender-900: #4c1d95;
   }
 }
 
