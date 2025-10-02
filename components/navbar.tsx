@@ -33,24 +33,16 @@ export default function Navbar() {
 
           {/* Center - Logo */}
           <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2">
-            {/* College Logo and Name */}
-            <div className="flex items-center space-x-1 mb-2">
-              {/* Left Orange Circle */}
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-xs">⚙️</span>
-              </div>
-              
-              {/* College Name */}
-              <div className="flex items-center space-x-1 mx-2">
-                <span className="text-blue-600 font-bold text-xl tracking-wide hidden sm:inline">AVS</span>
-                <span className="text-blue-600 font-semibold text-sm hidden md:inline">ENGINEERING</span>
-                <span className="text-blue-600 font-semibold text-sm hidden md:inline">COLLEGE</span>
-              </div>
-              
-              {/* Right Red Circle */}
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-md">
-                <span className="text-white font-bold text-xs">🎓</span>
-              </div>
+            {/* College Logo */}
+            <div className="flex items-center space-x-3 mb-2">
+              <Image
+                src="https://avsec-it.vercel.app/logo.png"
+                alt="AVS Engineering College"
+                width={200}
+                height={60}
+                className="h-12 sm:h-16 w-auto"
+                priority
+              />
             </div>
             
             {/* Department Name */}
