@@ -101,7 +101,7 @@ export default function UsersManagement() {
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       <Navbar />
       
-      <div className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900">User Management</h1>

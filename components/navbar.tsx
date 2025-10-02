@@ -35,7 +35,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-gradient-to-r from-gray-50 to-white shadow-lg border-b border-gray-200">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-20">
           {/* Left side - Navigation Menu */}
           <div className="flex items-center space-x-4">
