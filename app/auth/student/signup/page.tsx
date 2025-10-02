@@ -67,6 +67,14 @@ export default function StudentSignUp() {
     }
   };
 
+  // Get available semesters based on selected year
+  const getAvailableSemesters = () => {
+    if (!formData.year) return [];
+    const year = parseInt(formData.year);
+    const yearConfig = ACADEMIC_CONFIG.SUBJECTS_BY_YEAR_SEMESTER[year as keyof typeof ACADEMIC_CONFIG.SUBJECTS_BY_YEAR_SEMESTER];
+    return yearConfig ? Object.keys(yearConfig).map(Number) : [];
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-teal-50 to-blue-100 flex items-center justify-center px-4 py-8">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
@@ -133,7 +141,7 @@ export default function StudentSignUp() {
                 id="year"
                 required
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, year: e.target.value, semester: '' })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
               >
                 <option value="">Select</option>
@@ -154,12 +162,13 @@ export default function StudentSignUp() {
                 required
                 value={formData.semester}
                 onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                disabled={!formData.year}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
-                <option value="">Select</option>
-                {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
+                <option value="">{formData.year ? 'Select' : 'Select year first'}</option>
+                {getAvailableSemesters().map((sem) => (
                   <option key={sem} value={sem}>
-                    Sem {sem}
+                    Semester {sem}
                   </option>
                 ))}
               </select>

@@ -51,7 +51,22 @@ export default function SignUpPage() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // If year changes, reset semester
+    if (name === 'year') {
+      setFormData({ ...formData, year: value, semester: '' });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  // Get available semesters based on selected year
+  const getAvailableSemesters = () => {
+    if (!formData.year) return [];
+    const year = parseInt(formData.year);
+    const yearConfig = ACADEMIC_CONFIG.SUBJECTS_BY_YEAR_SEMESTER[year as keyof typeof ACADEMIC_CONFIG.SUBJECTS_BY_YEAR_SEMESTER];
+    return yearConfig ? Object.keys(yearConfig).map(Number) : [];
   };
 
   return (
@@ -187,12 +202,13 @@ export default function SignUpPage() {
                     required
                     value={formData.semester}
                     onChange={handleChange}
-                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    disabled={!formData.year}
+                    className="appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
-                    <option value="">Select</option>
-                    {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
+                    <option value="">{formData.year ? 'Select' : 'Select year first'}</option>
+                    {getAvailableSemesters().map((sem) => (
                       <option key={sem} value={sem}>
-                        {sem}
+                        Semester {sem}
                       </option>
                     ))}
                   </select>
