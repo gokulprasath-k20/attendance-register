@@ -15,9 +15,9 @@ export default function Navbar() {
     : [];
 
   return (
-    <nav className="bg-white shadow-md border-b border-gray-200">
+    <nav className="bg-gradient-to-r from-gray-50 to-white shadow-lg border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-20">
+        <div className="relative flex items-center justify-between h-24">
           {/* Left side - Navigation Menu */}
           <div className="flex items-center space-x-4">
             {menuItems.map((item) => (
@@ -32,19 +32,31 @@ export default function Navbar() {
           </div>
 
           {/* Center - Logo */}
-          <div className="flex items-center space-x-3 absolute left-1/2 transform -translate-x-1/2">
-            <Image
-              src="https://avsec-it.vercel.app/logo.png"
-              alt="AVS Engineering College"
-              width={180}
-              height={60}
-              className="h-12 sm:h-16 w-auto"
-              priority
-            />
-            <div className="border-l border-gray-300 h-8 sm:h-12"></div>
-            <div className="text-center hidden sm:block">
-              <h1 className="text-base sm:text-lg font-bold text-gray-800">Attendance System</h1>
-              <p className="text-xs text-gray-600">Department of Information Technology</p>
+          <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2">
+            {/* College Logo and Name */}
+            <div className="flex items-center space-x-1 mb-2">
+              {/* Left Orange Circle */}
+              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-xs">⚙️</span>
+              </div>
+              
+              {/* College Name */}
+              <div className="flex items-center space-x-1 mx-2">
+                <span className="text-blue-600 font-bold text-xl tracking-wide hidden sm:inline">AVS</span>
+                <span className="text-blue-600 font-semibold text-sm hidden md:inline">ENGINEERING</span>
+                <span className="text-blue-600 font-semibold text-sm hidden md:inline">COLLEGE</span>
+              </div>
+              
+              {/* Right Red Circle */}
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-xs">🎓</span>
+              </div>
+            </div>
+            
+            {/* Department Name */}
+            <div className="text-center">
+              <h1 className="text-base sm:text-lg font-semibold text-gray-800 tracking-wide">Department of Information Technology</h1>
+              <p className="text-xs text-gray-500 mt-1 hidden sm:block">Attendance Management System</p>
             </div>
           </div>
 
