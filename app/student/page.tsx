@@ -50,13 +50,21 @@ export default function StudentDashboard() {
   };
 
   // Fetch student profile
-  const { data: profileData } = useQuery({
+  const { data: profileData, error: profileError, isLoading: profileLoading } = useQuery({
     queryKey: ['student-profile'],
     queryFn: async () => {
+      console.log('Fetching student profile...');
       const response = await fetch('/api/auth/profile');
-      if (!response.ok) throw new Error('Failed to fetch profile');
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Profile fetch failed:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch profile');
+      }
+      const data = await response.json();
+      console.log('Profile data received:', data);
+      return data;
     },
+    retry: 1,
   });
 
   // Update available subjects based on student's year and semester
@@ -74,13 +82,21 @@ export default function StudentDashboard() {
     }
   }, [profileData]);
 
-  const { data: attendanceData, refetch } = useQuery({
+  const { data: attendanceData, error: attendanceError, refetch } = useQuery({
     queryKey: ['student-attendance'],
     queryFn: async () => {
+      console.log('Fetching attendance data...');
       const response = await fetch('/api/attendance');
-      if (!response.ok) throw new Error('Failed to fetch attendance');
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Attendance fetch failed:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch attendance');
+      }
+      const data = await response.json();
+      console.log('Attendance data received:', data);
+      return data;
     },
+    retry: 1,
   });
 
   const handleMarkAttendance = async (e: React.FormEvent) => {
@@ -128,6 +144,59 @@ export default function StudentDashboard() {
     }
   };
 
+  // Show loading state
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <div className="flex items-center justify-center h-64">
+              <LoadingSpinner size="lg" />
+              <span className="ml-3 text-lg text-gray-600">Loading student dashboard...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (profileError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-red-800 mb-2">
+                Unable to Load Student Dashboard
+              </h2>
+              <p className="text-red-700 mb-4">
+                {profileError.message || 'Failed to load student profile'}
+              </p>
+              <div className="space-y-2 text-sm text-red-600">
+                <p><strong>Possible causes:</strong></p>
+                <ul className="list-disc list-inside ml-4">
+                  <li>You are not logged in as a student</li>
+                  <li>Your student profile is not set up properly</li>
+                  <li>Database connection issues</li>
+                  <li>Missing environment variables</li>
+                </ul>
+              </div>
+              <button
+                onClick={() => window.location.href = '/auth/student/signin'}
+                className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+              >
+                Go to Student Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
@@ -138,6 +207,18 @@ export default function StudentDashboard() {
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Student Dashboard
           </h1>
+
+          {/* Debug Information */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h3 className="font-semibold text-blue-800 mb-2">Debug Information</h3>
+              <div className="text-sm text-blue-700">
+                <p><strong>Profile Data:</strong> {JSON.stringify(profileData, null, 2)}</p>
+                <p><strong>Available Subjects:</strong> {availableSubjects.join(', ')}</p>
+                <p><strong>Student Info:</strong> {JSON.stringify(studentInfo, null, 2)}</p>
+              </div>
+            </div>
+          )}
 
           {/* Mark Attendance Section */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
@@ -280,7 +361,13 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {!attendanceData ? (
+            {attendanceError ? (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700">
+                  <strong>Error loading attendance history:</strong> {attendanceError.message}
+                </p>
+              </div>
+            ) : !attendanceData ? (
               <AttendanceTableSkeleton rows={8} />
             ) : (
               <div className="overflow-x-auto">
