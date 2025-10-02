@@ -50,7 +50,7 @@ export default function StudentSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-teal-50 to-blue-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
@@ -71,7 +71,7 @@ export default function StudentSignIn() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent transition-all"
               placeholder="student@example.com"
             />
           </div>
@@ -86,7 +86,7 @@ export default function StudentSignIn() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent transition-all"
               placeholder="••••••••"
             />
           </div>
@@ -94,7 +94,7 @@ export default function StudentSignIn() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-teal-600 to-green-600 text-white py-3 rounded-lg font-medium hover:from-teal-700 hover:to-green-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-[#8B44F7] text-white py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? <LoadingSpinner size="sm" /> : 'Sign In as Student'}
           </button>
@@ -103,7 +103,7 @@ export default function StudentSignIn() {
         <div className="mt-6 text-center space-y-2">
           <p className="text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/auth/student/signup" className="text-teal-600 hover:text-teal-700 font-medium">
+            <Link href="/auth/student/signup" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
               Register
             </Link>
           </p>

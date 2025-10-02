@@ -164,7 +164,8 @@ export default function StudentDashboard() {
                   value={selectedSubject}
                   onChange={(e) => setSelectedSubject(e.target.value)}
                   required
-                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={!availableSubjects.length}
                 >
                   <option value="">Select the subject for this period</option>
                   {availableSubjects.map((subject) => (
@@ -173,32 +174,23 @@ export default function StudentDashboard() {
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  Select the subject that matches the current period
-                </p>
               </div>
               <div>
-                <label
-                  htmlFor="otp"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Enter OTP Code *
-                </label>
                 <input
-                  id="otp"
                   type="text"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value)}
                   required
                   maxLength={6}
-                  className="appearance-none block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD] focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Enter 6-digit OTP"
+                  disabled={!selectedSubject}
                 />
               </div>
               <button
                 type="submit"
-                disabled={loading || !selectedSubject}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                disabled={!selectedSubject || !otpCode || loading}
+                className="w-full bg-[#9B7EBD] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#8B6EAD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9B7EBD] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
               >
                 {loading ? <LoadingSpinner size="sm" /> : 'Mark Attendance'}
               </button>
@@ -221,7 +213,7 @@ export default function StudentDashboard() {
                   <select
                     value={tempFilters.subject}
                     onChange={(e) => setTempFilters({ ...tempFilters, subject: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Subjects</option>
                     {availableSubjects.map((subject) => (
@@ -239,7 +231,7 @@ export default function StudentDashboard() {
                   <select
                     value={tempFilters.status}
                     onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Status</option>
                     <option value="P">Present Only</option>
@@ -255,7 +247,7 @@ export default function StudentDashboard() {
                     type="date"
                     value={tempFilters.startDate}
                     onChange={(e) => setTempFilters({ ...tempFilters, startDate: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   />
                 </div>
 
@@ -267,7 +259,7 @@ export default function StudentDashboard() {
                     type="date"
                     value={tempFilters.endDate}
                     onChange={(e) => setTempFilters({ ...tempFilters, endDate: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   />
                 </div>
               </div>
@@ -275,7 +267,7 @@ export default function StudentDashboard() {
               <div className="flex gap-2">
                 <button
                   onClick={applyFilters}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
                 >
                   Apply Filters
                 </button>
@@ -293,7 +285,7 @@ export default function StudentDashboard() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-purple-50">
+                  <thead className="bg-purple-50/50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Date

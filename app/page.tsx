@@ -31,7 +31,7 @@ export default function Home() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -39,14 +39,14 @@ export default function Home() {
 
   if (status === 'authenticated') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
@@ -60,20 +60,20 @@ export default function Home() {
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Student Portal</h3>
             <div className="max-w-md mx-auto">
               {/* Student Card */}
-              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all border-2 border-teal-200 hover:border-teal-400">
+              <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all border-2 border-purple-200 hover:border-[#8B44F7]">
                 <div className="text-6xl mb-4">🎓</div>
                 <h4 className="text-2xl font-bold text-gray-900 mb-3">Student</h4>
                 <p className="text-gray-600 mb-6">Mark attendance & view history</p>
                 <div className="space-y-3">
                   <Link
                     href="/auth/student/signin"
-                    className="block w-full bg-gradient-to-r from-teal-600 to-green-600 text-white px-6 py-3 rounded-lg font-medium hover:from-teal-700 hover:to-green-700 transition-all"
+                    className="block w-full bg-[#8B44F7] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/auth/student/signup"
-                    className="block w-full bg-white text-teal-600 px-6 py-3 rounded-lg font-medium border-2 border-teal-600 hover:bg-teal-50 transition-all"
+                    className="block w-full bg-white text-[#8B44F7] px-6 py-3 rounded-lg font-medium border-2 border-[#8B44F7] hover:bg-purple-50 transition-all"
                   >
                     Register
                   </Link>
@@ -121,8 +121,8 @@ export default function Home() {
               Student Features
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div className="p-6 bg-gradient-to-br from-teal-50 to-green-50 rounded-lg">
-                <h3 className="text-xl font-bold text-teal-700 mb-3">📱 Easy Attendance</h3>
+              <div className="p-6 bg-purple-50 rounded-lg">
+                <h3 className="text-xl font-bold text-[#8B44F7] mb-3">📱 Easy Attendance</h3>
                 <ul className="text-gray-700 space-y-2 text-left">
                   <li>• Mark attendance with OTP</li>
                   <li>• GPS-based verification</li>
@@ -130,8 +130,8 @@ export default function Home() {
                 </ul>
               </div>
 
-              <div className="p-6 bg-gradient-to-br from-teal-50 to-green-50 rounded-lg">
-                <h3 className="text-xl font-bold text-teal-700 mb-3">📊 Track Progress</h3>
+              <div className="p-6 bg-purple-50 rounded-lg">
+                <h3 className="text-xl font-bold text-[#8B44F7] mb-3">📊 Track Progress</h3>
                 <ul className="text-gray-700 space-y-2 text-left">
                   <li>• View attendance history</li>
                   <li>• Check attendance status</li>

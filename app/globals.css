@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --lavender-50: #faf5ff;
-  --lavender-100: #f3e8ff;
-  --lavender-200: #e9d5ff;
-  --lavender-300: #d8b4fe;
-  --lavender-400: #c084fc;
-  --lavender-500: #a855f7;
-  --lavender-600: #9333ea;
-  --lavender-700: #7e22ce;
-  --lavender-800: #6b21a8;
-  --lavender-900: #581c87;
+  --lavender-50: #f5f3ff;
+  --lavender-100: #ede9fe;
+  --lavender-200: #ddd6fe;
+  --lavender-300: #c4b5fd;
+  --lavender-400: #a78bfa;
+  --lavender-500: #8B44F7;
+  --lavender-600: #7c3aed;
+  --lavender-700: #6d28d9;
+  --lavender-800: #5b21b6;
+  --lavender-900: #4c1d95;
 }
 
 @theme inline {
@@ -55,10 +55,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #a855f7;
+  background: #8B44F7;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9333ea;
+  background: #7c3aed;
 }

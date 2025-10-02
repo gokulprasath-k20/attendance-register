@@ -254,7 +254,7 @@ export default function StaffDashboard() {
                       setFormData({ ...formData, year: e.target.value, semester: '', subject: '' })
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">Select Year</option>
                     {ACADEMIC_CONFIG.YEARS.map((year) => (
@@ -276,7 +276,7 @@ export default function StaffDashboard() {
                     }
                     required
                     disabled={!formData.year}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD] disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Semester</option>
                     {formData.year && ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
@@ -298,7 +298,7 @@ export default function StaffDashboard() {
                     }
                     required
                     disabled={!formData.year || !formData.semester}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD] disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Subject</option>
                     {availableSubjects.map((subject) => (
@@ -318,7 +318,7 @@ export default function StaffDashboard() {
                     onChange={(e) =>
                       setFormData({ ...formData, period: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">Select Period</option>
                     {ACADEMIC_CONFIG.PERIODS.map((period) => (
@@ -333,7 +333,7 @@ export default function StaffDashboard() {
               <button
                 type="submit"
                 disabled={generateOTPMutation.isPending}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                className="w-full bg-[#9B7EBD] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#8B6EAD] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#9B7EBD] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
               >
                 {generateOTPMutation.isPending ? (
                   <LoadingSpinner size="sm" />
@@ -345,7 +345,7 @@ export default function StaffDashboard() {
 
             {/* Display Generated OTP */}
             {generatedOTP && (
-              <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg">
+              <div className="mt-6 p-6 bg-purple-50 border-2 border-purple-200 rounded-lg">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">
                     ✅ OTP Generated Successfully!
@@ -390,13 +390,13 @@ export default function StaffDashboard() {
               <div className="space-x-2">
                 <button
                   onClick={handleExportExcel}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
                 >
                   Export Excel
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
                 >
                   Export PDF
                 </button>
@@ -413,7 +413,7 @@ export default function StaffDashboard() {
                   <select
                     value={tempFilters.subject}
                     onChange={(e) => setTempFilters({ ...tempFilters, subject: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Subjects</option>
                     {staffSubjects.map((subject) => (
@@ -431,7 +431,7 @@ export default function StaffDashboard() {
                   <select
                     value={tempFilters.year}
                     onChange={(e) => setTempFilters({ ...tempFilters, year: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Years</option>
                     {ACADEMIC_CONFIG.YEARS.map((year) => (
@@ -449,7 +449,7 @@ export default function StaffDashboard() {
                   <select
                     value={tempFilters.semester}
                     onChange={(e) => setTempFilters({ ...tempFilters, semester: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Semesters</option>
                     {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
@@ -467,7 +467,7 @@ export default function StaffDashboard() {
                   <select
                     value={tempFilters.status}
                     onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Status</option>
                     <option value="P">Present Only</option>
@@ -483,7 +483,7 @@ export default function StaffDashboard() {
                     type="date"
                     value={tempFilters.startDate}
                     onChange={(e) => setTempFilters({ ...tempFilters, startDate: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   />
                 </div>
 
@@ -495,7 +495,7 @@ export default function StaffDashboard() {
                     type="date"
                     value={tempFilters.endDate}
                     onChange={(e) => setTempFilters({ ...tempFilters, endDate: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   />
                 </div>
               </div>
@@ -503,7 +503,7 @@ export default function StaffDashboard() {
               <div className="flex gap-2">
                 <button
                   onClick={applyFilters}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
                 >
                   Apply Filters
                 </button>
@@ -521,7 +521,7 @@ export default function StaffDashboard() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-purple-50">
+                  <thead className="bg-purple-50/50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Student Name

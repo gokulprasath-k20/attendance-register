@@ -76,7 +76,7 @@ export default function StudentSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-teal-50 to-blue-100 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
@@ -97,7 +97,7 @@ export default function StudentSignUp() {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               placeholder="John Doe"
             />
           </div>
@@ -112,7 +112,7 @@ export default function StudentSignUp() {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               placeholder="student@example.com"
             />
           </div>
@@ -127,7 +127,7 @@ export default function StudentSignUp() {
               required
               value={formData.regNo}
               onChange={(e) => setFormData({ ...formData, regNo: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               placeholder="2024001"
             />
           </div>
@@ -142,7 +142,7 @@ export default function StudentSignUp() {
                 required
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: e.target.value, semester: '' })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               >
                 <option value="">Select</option>
                 {ACADEMIC_CONFIG.YEARS.map((year) => (
@@ -188,7 +188,7 @@ export default function StudentSignUp() {
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -203,7 +203,7 @@ export default function StudentSignUp() {
               required
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent"
               placeholder="••••••••"
             />
           </div>
@@ -211,7 +211,7 @@ export default function StudentSignUp() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-teal-600 to-green-600 text-white py-3 rounded-lg font-medium hover:from-teal-700 hover:to-green-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-[#8B44F7] text-white py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? <LoadingSpinner size="sm" /> : 'Create Student Account'}
           </button>
@@ -220,7 +220,7 @@ export default function StudentSignUp() {
         <div className="mt-6 text-center space-y-2">
           <p className="text-gray-600">
             Already have an account?{' '}
-            <Link href="/auth/student/signin" className="text-teal-600 hover:text-teal-700 font-medium">
+            <Link href="/auth/student/signin" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
               Sign In
             </Link>
           </p>

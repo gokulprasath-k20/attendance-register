@@ -40,7 +40,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-2xl">
@@ -67,7 +67,7 @@ export default function SignInPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-[#8B44F7] sm:text-sm"
                 placeholder="Enter your email"
               />
             </div>
@@ -84,7 +84,7 @@ export default function SignInPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-[#8B44F7] sm:text-sm"
                 placeholder="Enter your password"
               />
             </div>
@@ -94,19 +94,34 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-[#8B44F7] hover:bg-[#7c3aed] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8B44F7] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
             >
               {loading ? <LoadingSpinner size="sm" /> : 'Sign in'}
             </button>
           </div>
 
           <div className="text-center">
-            <Link
-              href="/auth/signup"
-              className="text-purple-600 hover:text-purple-500 font-medium"
-            >
-              Don&apos;t have an account? Sign up
-            </Link>
+            <p className="text-sm text-gray-600 mb-2">Don&apos;t have an account?</p>
+            <div className="flex flex-col space-y-2">
+              <Link
+                href="/auth/student/signup"
+                className="text-[#8B44F7] hover:text-[#7c3aed] font-medium text-sm"
+              >
+                Sign up as Student
+              </Link>
+              <Link
+                href="/auth/staff/signup"
+                className="text-[#8B44F7] hover:text-[#7c3aed] font-medium text-sm"
+              >
+                Sign up as Staff
+              </Link>
+              <Link
+                href="/auth/admin/signup"
+                className="text-[#8B44F7] hover:text-[#7c3aed] font-medium text-sm"
+              >
+                Sign up as Admin
+              </Link>
+            </div>
           </div>
         </form>
       </div>

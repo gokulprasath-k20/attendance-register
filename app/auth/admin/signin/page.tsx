@@ -51,7 +51,7 @@ export default function AdminSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
@@ -72,7 +72,7 @@ export default function AdminSignIn() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent transition-all"
               placeholder="admin@example.com"
             />
           </div>
@@ -87,7 +87,7 @@ export default function AdminSignIn() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7] focus:border-transparent transition-all"
               placeholder="••••••••"
             />
           </div>
@@ -95,7 +95,7 @@ export default function AdminSignIn() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-[#8B44F7] text-white py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
             {isLoading ? <LoadingSpinner size="sm" /> : 'Sign In as Admin'}
           </button>
@@ -104,7 +104,7 @@ export default function AdminSignIn() {
         <div className="mt-6 text-center space-y-2">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/auth/admin/signup" className="text-purple-600 hover:text-purple-700 font-medium">
+            <Link href="/auth/admin/signup" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
               Register
             </Link>
           </p>

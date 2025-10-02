@@ -76,13 +76,13 @@ export default function AdminDashboard() {
               <div className="space-x-2">
                 <button
                   onClick={handleExportExcel}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
                 >
                   Export Excel
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
                 >
                   Export PDF
                 </button>
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
             ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-purple-50">
+                  <thead className="bg-purple-50/50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Student Name

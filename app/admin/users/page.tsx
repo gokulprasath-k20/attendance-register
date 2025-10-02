@@ -97,7 +97,7 @@ export default function UsersManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-screen bg-white">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       <Navbar />
       
@@ -107,7 +107,7 @@ export default function UsersManagement() {
             <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
             <button
               onClick={() => setShowModal(true)}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl"
+              className="bg-[#8B44F7] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all shadow-lg hover:shadow-xl"
             >
               Create User
             </button>
@@ -199,7 +199,7 @@ export default function UsersManagement() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                 />
               </div>
 
@@ -212,7 +212,7 @@ export default function UsersManagement() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                 />
               </div>
 
@@ -225,7 +225,7 @@ export default function UsersManagement() {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                 />
               </div>
 
@@ -237,7 +237,7 @@ export default function UsersManagement() {
                   required
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                 >
                   <option value="student">Student</option>
                   <option value="staff">Staff</option>
@@ -256,7 +256,7 @@ export default function UsersManagement() {
                       required
                       value={formData.regNo}
                       onChange={(e) => setFormData({ ...formData, regNo: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                     />
                   </div>
 
@@ -269,7 +269,7 @@ export default function UsersManagement() {
                         required
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                       >
                         <option value="">Select</option>
                         {ACADEMIC_CONFIG.YEARS.map((year) => (
@@ -288,7 +288,7 @@ export default function UsersManagement() {
                         required
                         value={formData.semester}
                         onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B44F7]"
                       >
                         <option value="">Select</option>
                         {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
@@ -306,7 +306,7 @@ export default function UsersManagement() {
                 <button
                   type="submit"
                   disabled={createUserMutation.isPending}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
+                  className="flex-1 bg-[#8B44F7] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#7c3aed] disabled:opacity-50 transition-all"
                 >
                   {createUserMutation.isPending ? <LoadingSpinner size="sm" /> : 'Create'}
                 </button>
