@@ -65,7 +65,7 @@ export default function AdminSignUp() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
         <div className="text-center mb-8">
           <div className="mb-6">
             <Image
