@@ -21,7 +21,32 @@ export default function StudentDashboard() {
     startDate: '',
     endDate: '',
   });
+  const [tempFilters, setTempFilters] = useState({
+    subject: '',
+    status: '',
+    startDate: '',
+    endDate: '',
+  });
   const { toast, showToast, closeToast } = useToast();
+
+  const applyFilters = () => {
+    setHistoryFilters(tempFilters);
+  };
+
+  const clearFilters = () => {
+    setTempFilters({
+      subject: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+    });
+    setHistoryFilters({
+      subject: '',
+      status: '',
+      startDate: '',
+      endDate: '',
+    });
+  };
 
   // Fetch student profile
   const { data: profileData } = useQuery({
@@ -186,62 +211,79 @@ export default function StudentDashboard() {
             </h2>
             
             {/* History Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
-                <select
-                  value={historyFilters.subject}
-                  onChange={(e) => setHistoryFilters({ ...historyFilters, subject: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+            <div className="p-4 bg-gray-50 rounded-lg mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Subject
+                  </label>
+                  <select
+                    value={tempFilters.subject}
+                    onChange={(e) => setTempFilters({ ...tempFilters, subject: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">All Subjects</option>
+                    {availableSubjects.map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={tempFilters.status}
+                    onChange={(e) => setTempFilters({ ...tempFilters, status: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">All Status</option>
+                    <option value="P">Present Only</option>
+                    <option value="A">Absent Only</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.startDate}
+                    onChange={(e) => setTempFilters({ ...tempFilters, startDate: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.endDate}
+                    onChange={(e) => setTempFilters({ ...tempFilters, endDate: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={applyFilters}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
-                  <option value="">All Subjects</option>
-                  {availableSubjects.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Status
-                </label>
-                <select
-                  value={historyFilters.status}
-                  onChange={(e) => setHistoryFilters({ ...historyFilters, status: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  Apply Filters
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors text-sm"
                 >
-                  <option value="">All Status</option>
-                  <option value="P">Present Only</option>
-                  <option value="A">Absent Only</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  value={historyFilters.startDate}
-                  onChange={(e) => setHistoryFilters({ ...historyFilters, startDate: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  value={historyFilters.endDate}
-                  onChange={(e) => setHistoryFilters({ ...historyFilters, endDate: e.target.value })}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
+                  Clear Filters
+                </button>
               </div>
             </div>
 
