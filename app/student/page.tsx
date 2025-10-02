@@ -8,7 +8,7 @@ import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { getCurrentLocation } from '@/lib/utils/geolocation';
 import { formatDistance } from '@/lib/utils/geolocation';
-import { getSubjectsForYearAndSemester } from '@/lib/utils/subjects';
+import { getSubjectsForYearAndSemester, getActualSemesterNumber } from '@/lib/utils/subjects';
 
 export default function StudentDashboard() {
   const [otpCode, setOtpCode] = useState('');
@@ -216,6 +216,9 @@ export default function StudentDashboard() {
                 <p><strong>Profile Data:</strong> {JSON.stringify(profileData, null, 2)}</p>
                 <p><strong>Available Subjects:</strong> {availableSubjects.join(', ')}</p>
                 <p><strong>Student Info:</strong> {JSON.stringify(studentInfo, null, 2)}</p>
+                {studentInfo && (
+                  <p><strong>Actual Semester:</strong> {getActualSemesterNumber(studentInfo.year!, studentInfo.semester!)}</p>
+                )}
               </div>
             </div>
           )}
@@ -228,7 +231,7 @@ export default function StudentDashboard() {
             {studentInfo && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Your Class:</strong> Year {studentInfo.year} - Semester {studentInfo.semester}
+                  <strong>Your Class:</strong> Year {studentInfo.year} - Semester {getActualSemesterNumber(studentInfo.year!, studentInfo.semester!)}
                 </p>
               </div>
             )}

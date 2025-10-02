@@ -7,7 +7,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
-import { getAllSubjects } from '@/lib/utils/subjects';
+import { getAllSubjects, getActualSemesterNumber } from '@/lib/utils/subjects';
 
 export default function AdminDashboard() {
   const { toast, showToast, closeToast } = useToast();
@@ -230,8 +230,8 @@ export default function AdminDashboard() {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9B7EBD]"
                   >
                     <option value="">All Semesters</option>
-                    <option value="1">Semester 1</option>
-                    <option value="2">Semester 2</option>
+                    <option value="1">Semester 1 (Internal)</option>
+                    <option value="2">Semester 2 (Internal)</option>
                   </select>
                 </div>
 
@@ -329,7 +329,10 @@ export default function AdminDashboard() {
                           {record.profiles?.reg_no}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {record.profiles?.year}/{record.profiles?.semester}
+                          {record.profiles?.year && record.profiles?.semester 
+                            ? `Year ${record.profiles.year} / Sem ${getActualSemesterNumber(record.profiles.year, record.profiles.semester)}`
+                            : 'N/A'
+                          }
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.otp_sessions?.subject}

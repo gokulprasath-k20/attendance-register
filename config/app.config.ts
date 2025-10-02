@@ -55,9 +55,9 @@ export const ATTENDANCE_CONFIG = {
 // Academic configuration
 export const ACADEMIC_CONFIG = {
   YEARS: [2, 3, 4], // Only years 2-4 are allowed
-  SEMESTERS: [1, 2], // Represents first and second semester of each year
+  SEMESTERS: [1, 2], // Internal representation: 1=first sem of year, 2=second sem of year
   
-  // Mapping of subjects by year and semester
+  // Mapping of subjects by year and semester (internal 1,2 maps to actual semester numbers)
   SUBJECTS_BY_YEAR_SEMESTER: {
     2: {
       1: ['DM', 'DPCO', 'DSA', 'FDS', 'OOPS'], // 2nd Year / 3rd Semester

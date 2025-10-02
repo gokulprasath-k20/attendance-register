@@ -40,6 +40,31 @@ export function getSemesterLabel(year: number, semester: number): string {
 }
 
 /**
+ * Get actual semester number from year and internal semester
+ */
+export function getActualSemesterNumber(year: number, semester: number): number {
+  return (year - 1) * 2 + semester;
+}
+
+/**
+ * Get available semester options for a specific year (returns actual semester numbers)
+ */
+export function getSemesterOptionsForYear(year: number): Array<{value: number, label: string, actualSem: number}> {
+  if (!ACADEMIC_CONFIG.YEARS.includes(year as 2 | 3 | 4)) {
+    return [];
+  }
+  
+  return ACADEMIC_CONFIG.SEMESTERS.map(internalSem => {
+    const actualSem = getActualSemesterNumber(year, internalSem);
+    return {
+      value: internalSem,
+      label: `Semester ${actualSem}`,
+      actualSem: actualSem
+    };
+  });
+}
+
+/**
  * Validate if a subject exists for a given year and semester
  */
 export function isValidSubjectForYearSemester(
