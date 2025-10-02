@@ -154,7 +154,7 @@ export default function StaffSignUp() {
               Subjects You Teach
             </label>
             <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-              {ACADEMIC_CONFIG.SUBJECTS.map((subject) => (
+              {ACADEMIC_CONFIG.ALL_SUBJECTS.map((subject: string) => (
                 <label
                   key={subject}
                   className="flex items-center p-2 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"

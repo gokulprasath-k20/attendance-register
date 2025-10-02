@@ -49,18 +49,35 @@ export const ATTENDANCE_CONFIG = {
 
 // Academic configuration
 export const ACADEMIC_CONFIG = {
-  YEARS: [1, 2, 3, 4],
-  SEMESTERS: [1, 2],
-  SUBJECTS: [
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Computer Science',
-    'Electronics',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Electrical Engineering',
-  ],
+  YEARS: [2, 3, 4], // Only years 2-4 are allowed
+  SEMESTERS: [1, 2], // Represents first and second semester of each year
+  
+  // Mapping of subjects by year and semester
+  SUBJECTS_BY_YEAR_SEMESTER: {
+    2: {
+      1: ['DM', 'DPCO', 'DSA', 'FDS', 'OOPS'], // 2nd Year / 3rd Semester
+      2: ['TOC', 'OS', 'DBMS', 'ESS', 'WE', 'AI & ML'], // 2nd Year / 4th Semester
+    },
+    3: {
+      1: ['FSWD', 'ES & IoT', 'STA', 'CC', 'DC', 'CN'], // 3rd Year / 5th Semester
+      2: ['Dummy Subject 1', 'Dummy Subject 2', 'Dummy Subject 3'], // 3rd Year / 6th Semester
+    },
+    4: {
+      1: ['Dummy Subject 1', 'Dummy Subject 2', 'Dummy Subject 3'], // 4th Year / 7th Semester
+      2: ['Dummy Subject 1', 'Dummy Subject 2', 'Dummy Subject 3'], // 4th Year / 8th Semester
+    },
+  } as const,
+  
+  // All unique subjects across all years and semesters
+  ALL_SUBJECTS: [
+    'DM', 'DPCO', 'DSA', 'FDS', 'OOPS',
+    'TOC', 'OS', 'DBMS', 'ESS', 'WE', 'AI & ML',
+    'FSWD', 'ES & IoT', 'STA', 'CC', 'DC', 'CN',
+    'Dummy Subject 1', 'Dummy Subject 2', 'Dummy Subject 3',
+  ] as const,
+  
+  // Periods per day
+  PERIODS: [1, 2, 3, 4, 5, 6, 7, 8],
 } as const;
 
 // Query client configuration

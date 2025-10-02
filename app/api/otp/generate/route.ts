@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { latitude, longitude, subject, year, semester } = body;
+    const { latitude, longitude, subject, year, semester, period } = body;
 
     if (!latitude || !longitude || !subject || !year || !semester) {
       return NextResponse.json(
@@ -52,18 +52,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Create OTP session
+    const insertData: any = {
+      otp_code: otpCode,
+      staff_id: session.user.id,
+      admin_lat: latitude,
+      admin_lng: longitude,
+      subject,
+      year: parseInt(year),
+      semester: parseInt(semester),
+      expires_at: calculateExpiryTime(),
+    };
+
+    // Add period if provided
+    if (period) {
+      insertData.period_number = parseInt(period);
+    }
+
     const { data: otpSession, error } = await supabase
       .from('otp_sessions')
-      .insert({
-        otp_code: otpCode,
-        staff_id: session.user.id,
-        admin_lat: latitude,
-        admin_lng: longitude,
-        subject,
-        year: parseInt(year),
-        semester: parseInt(semester),
-        expires_at: calculateExpiryTime(),
-      } as any)
+      .insert(insertData)
       .select()
       .single();
 

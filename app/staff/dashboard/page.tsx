@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -8,6 +8,7 @@ import Toast, { useToast } from '@/components/toast';
 import { getCurrentLocation } from '@/lib/utils/geolocation';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
+import { getSubjectsForYearAndSemester, getSemesterLabel } from '@/lib/utils/subjects';
 
 interface AttendanceRecord {
   id: string;
@@ -20,6 +21,8 @@ interface AttendanceRecord {
   };
   otp_sessions?: {
     subject: string;
+    year?: number;
+    semester?: number;
   };
 }
 
@@ -28,10 +31,37 @@ export default function StaffDashboard() {
     subject: '',
     year: '',
     semester: '',
+    period: '',
   });
   const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
   const [otpExpiry, setOtpExpiry] = useState<string | null>(null);
+  const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+  const [historyFilters, setHistoryFilters] = useState({
+    year: '',
+    semester: '',
+    status: '',
+    startDate: '',
+    endDate: '',
+  });
   const { toast, showToast, closeToast } = useToast();
+
+  // Update available subjects when year and semester change
+  useEffect(() => {
+    if (formData.year && formData.semester) {
+      const subjects = getSubjectsForYearAndSemester(
+        parseInt(formData.year),
+        parseInt(formData.semester)
+      );
+      setAvailableSubjects(subjects);
+      // Reset subject if not available in new selection
+      if (formData.subject && !subjects.includes(formData.subject)) {
+        setFormData(prev => ({ ...prev, subject: '' }));
+      }
+    } else {
+      setAvailableSubjects([]);
+      setFormData(prev => ({ ...prev, subject: '' }));
+    }
+  }, [formData.year, formData.semester, formData.subject]);
 
   const { data: attendanceData } = useQuery({
     queryKey: ['staff-attendance'],
@@ -43,7 +73,7 @@ export default function StaffDashboard() {
   });
 
   const generateOTPMutation = useMutation({
-    mutationFn: async (data: { latitude: number; longitude: number; subject: string; year: string; semester: string }) => {
+    mutationFn: async (data: { latitude: number; longitude: number; subject: string; year: string; semester: string; period?: string }) => {
       const response = await fetch('/api/otp/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,6 +109,7 @@ export default function StaffDashboard() {
         subject: formData.subject,
         year: formData.year,
         semester: formData.semester,
+        period: formData.period,
       });
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Failed to get location', 'error');
@@ -134,42 +165,21 @@ export default function StaffDashboard() {
               Generate Attendance OTP
             </h2>
             <form onSubmit={handleGenerateOTP} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Subject
-                  </label>
-                  <select
-                    value={formData.subject}
-                    onChange={(e) =>
-                      setFormData({ ...formData, subject: e.target.value })
-                    }
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">Select Subject</option>
-                    {ACADEMIC_CONFIG.SUBJECTS.map((subject) => (
-                      <option key={subject} value={subject}>
-                        {subject}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Year
+                    Year *
                   </label>
                   <select
                     value={formData.year}
                     onChange={(e) =>
-                      setFormData({ ...formData, year: e.target.value })
+                      setFormData({ ...formData, year: e.target.value, semester: '', subject: '' })
                     }
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="">Select Year</option>
-                    {[2, 3, 4].map((year) => (
+                    {ACADEMIC_CONFIG.YEARS.map((year) => (
                       <option key={year} value={year}>
                         Year {year}
                       </option>
@@ -179,20 +189,63 @@ export default function StaffDashboard() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Semester
+                    Semester *
                   </label>
                   <select
                     value={formData.semester}
                     onChange={(e) =>
-                      setFormData({ ...formData, semester: e.target.value })
+                      setFormData({ ...formData, semester: e.target.value, subject: '' })
                     }
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={!formData.year}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Semester</option>
-                    {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
+                    {formData.year && ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
                       <option key={sem} value={sem}>
-                        Semester {sem}
+                        {getSemesterLabel(parseInt(formData.year), sem)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subject *
+                  </label>
+                  <select
+                    value={formData.subject}
+                    onChange={(e) =>
+                      setFormData({ ...formData, subject: e.target.value })
+                    }
+                    required
+                    disabled={!formData.year || !formData.semester}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Select Subject</option>
+                    {availableSubjects.map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Period (Optional)
+                  </label>
+                  <select
+                    value={formData.period}
+                    onChange={(e) =>
+                      setFormData({ ...formData, period: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Period</option>
+                    {ACADEMIC_CONFIG.PERIODS.map((period) => (
+                      <option key={period} value={period}>
+                        Period {period}
                       </option>
                     ))}
                   </select>
@@ -254,7 +307,7 @@ export default function StaffDashboard() {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-900">
-                Attendance Records
+                Attendance History
               </h2>
               <div className="space-x-2">
                 <button
@@ -269,6 +322,84 @@ export default function StaffDashboard() {
                 >
                   Export PDF
                 </button>
+              </div>
+            </div>
+
+            {/* History Filters */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Year
+                </label>
+                <select
+                  value={historyFilters.year}
+                  onChange={(e) => setHistoryFilters({ ...historyFilters, year: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">All Years</option>
+                  {ACADEMIC_CONFIG.YEARS.map((year) => (
+                    <option key={year} value={year}>
+                      Year {year}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Semester
+                </label>
+                <select
+                  value={historyFilters.semester}
+                  onChange={(e) => setHistoryFilters({ ...historyFilters, semester: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">All Semesters</option>
+                  {ACADEMIC_CONFIG.SEMESTERS.map((sem) => (
+                    <option key={sem} value={sem}>
+                      Semester {sem}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <select
+                  value={historyFilters.status}
+                  onChange={(e) => setHistoryFilters({ ...historyFilters, status: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">All Status</option>
+                  <option value="P">Present Only</option>
+                  <option value="A">Absent Only</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  value={historyFilters.startDate}
+                  onChange={(e) => setHistoryFilters({ ...historyFilters, startDate: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  value={historyFilters.endDate}
+                  onChange={(e) => setHistoryFilters({ ...historyFilters, endDate: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
             </div>
 
@@ -290,12 +421,25 @@ export default function StaffDashboard() {
                         Date
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        Time
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Status
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {attendanceData.attendance.map((record: AttendanceRecord) => (
+                    {attendanceData.attendance
+                      .filter((record: AttendanceRecord) => {
+                        // Apply filters
+                        if (historyFilters.year && record.otp_sessions?.year?.toString() !== historyFilters.year) return false;
+                        if (historyFilters.semester && record.otp_sessions?.semester?.toString() !== historyFilters.semester) return false;
+                        if (historyFilters.status && record.status !== historyFilters.status) return false;
+                        if (historyFilters.startDate && new Date(record.created_at) < new Date(historyFilters.startDate)) return false;
+                        if (historyFilters.endDate && new Date(record.created_at) > new Date(historyFilters.endDate)) return false;
+                        return true;
+                      })
+                      .map((record: AttendanceRecord) => (
                       <tr key={record.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.profiles?.name}
@@ -308,6 +452,9 @@ export default function StaffDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {new Date(record.created_at).toLocaleTimeString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
