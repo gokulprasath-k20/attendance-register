@@ -82,12 +82,14 @@ export const ACADEMIC_CONFIG = {
   PERIODS: [1, 2, 3, 4, 5, 6, 7, 8],
 } as const;
 
-// Query client configuration
+// Query client configuration - Optimized for performance
 export const QUERY_CONFIG = {
-  STALE_TIME: 60 * 1000, // 1 minute
-  CACHE_TIME: 5 * 60 * 1000, // 5 minutes
-  REFETCH_ON_WINDOW_FOCUS: true,
+  STALE_TIME: 5 * 60 * 1000, // 5 minutes (longer stale time)
+  CACHE_TIME: 10 * 60 * 1000, // 10 minutes (longer cache)
+  REFETCH_ON_WINDOW_FOCUS: false, // Disable refetch on focus
   RETRY: 1,
+  REFETCH_ON_RECONNECT: false, // Disable refetch on reconnect
+  REFETCH_INTERVAL: false, // Disable automatic refetching
 } as const;
 
 // Navigation menu configuration

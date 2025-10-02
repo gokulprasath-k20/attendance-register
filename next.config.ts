@@ -7,6 +7,18 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: ['@tanstack/react-query', '@supabase/supabase-js'],
+  },
+  // Reduce bundle size
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Optimize images
+  images: {
+    formats: ['image/webp', 'image/avif'],
+  },
 };
 
 export default nextConfig;
