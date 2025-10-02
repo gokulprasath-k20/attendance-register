@@ -146,7 +146,6 @@ export default function StaffSignIn() {
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-500">Sign in as:</p>
           <div className="flex gap-2 mt-3 justify-center">
             <Link
               href="/auth/admin/signin"
