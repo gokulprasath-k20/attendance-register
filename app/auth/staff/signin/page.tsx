@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -37,6 +37,7 @@ export default function StaffSignIn() {
       
       if (session?.user?.role !== 'staff') {
         showToast('Access denied. Staff credentials required.', 'error');
+        await signOut({ redirect: false }); // Sign out
         setIsLoading(false);
         return;
       }

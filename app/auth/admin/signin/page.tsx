@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -37,7 +37,7 @@ export default function AdminSignIn() {
       
       if (session?.user?.role !== 'admin') {
         showToast('Access denied. Admin credentials required.', 'error');
-        await signIn('credentials', { redirect: false }); // Sign out
+        await signOut({ redirect: false }); // Sign out
         setIsLoading(false);
         return;
       }
