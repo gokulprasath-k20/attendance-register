@@ -125,16 +125,16 @@ export default function AdminDashboard() {
               <h2 className="text-xl font-semibold text-gray-900">
                 All Attendance Records
               </h2>
-              <div className="space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                 <button
                   onClick={handleExportExcel}
-                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm"
                 >
                   Export Excel
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm"
                 >
                   Export PDF
                 </button>
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
             {/* Advanced Filters */}
             <div className="p-4 bg-gray-50 rounded-lg mb-4">
               <h3 className="text-sm font-semibold text-gray-800 mb-3">Filter Records</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Subject

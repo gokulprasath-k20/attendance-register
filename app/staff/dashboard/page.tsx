@@ -387,16 +387,16 @@ export default function StaffDashboard() {
               <h2 className="text-xl font-semibold text-gray-900">
                 Attendance History
               </h2>
-              <div className="space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                 <button
                   onClick={handleExportExcel}
-                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm text-sm"
                 >
                   Export Excel
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm text-sm"
                 >
                   Export PDF
                 </button>
@@ -405,7 +405,8 @@ export default function StaffDashboard() {
 
             {/* History Filters */}
             <div className="p-4 bg-gray-50 rounded-lg mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-6 gap-3 mb-3">
+              <h3 className="text-sm font-semibold text-gray-800 mb-3">Filter Records</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-3">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Subject
@@ -519,7 +520,7 @@ export default function StaffDashboard() {
             {!attendanceData ? (
               <AttendanceTableSkeleton rows={8} />
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto -mx-6 px-6">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-purple-50/50">
                     <tr>
