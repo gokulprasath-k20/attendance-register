@@ -81,25 +81,25 @@ export default function StudentSignIn() {
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
-      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
-        <div className="text-center mb-8">
-          <div className="mb-6">
+      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-6">
+        <div className="text-center mb-6">
+          <div className="mb-4">
             <Image
               src="https://avsec-it.vercel.app/logo.png"
               alt="AVS Engineering College"
               width={200}
               height={60}
-              className="h-16 w-auto mx-auto mb-4"
+              className="h-12 w-auto mx-auto mb-3"
               priority
             />
-            <h3 className="text-lg font-semibold text-gray-800">Department of Information Technology</h3>
+            <h3 className="text-base font-semibold text-gray-800">Department of Information Technology</h3>
           </div>
-          <div className="text-4xl mb-4">🎓</div>
+          <div className="text-3xl mb-3">🎓</div>
           <h2 className="text-3xl font-bold text-gray-900">Student Sign In</h2>
           <p className="text-gray-600 mt-2">Access your student dashboard</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Student Email
@@ -146,7 +146,7 @@ export default function StudentSignIn() {
           </button>
         </form>
 
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-4 text-center space-y-2">
           <p className="text-gray-600">
             Don&apos;t have an account?{' '}
             <Link href="/auth/student/signup" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
