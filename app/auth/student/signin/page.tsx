@@ -158,22 +158,6 @@ export default function StudentSignIn() {
           </Link>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <div className="flex gap-2 mt-3 justify-center">
-            <Link
-              href="/auth/admin/signin"
-              className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Admin
-            </Link>
-            <Link
-              href="/auth/staff/signin"
-              className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Staff
-            </Link>
-          </div>
-        </div>
       </div>
     </div>
   );
