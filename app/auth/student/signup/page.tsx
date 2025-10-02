@@ -166,11 +166,14 @@ export default function StudentSignUp() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 <option value="">{formData.year ? 'Select' : 'Select year first'}</option>
-                {getAvailableSemesters().map((sem) => (
-                  <option key={sem} value={sem}>
-                    Semester {sem}
-                  </option>
-                ))}
+                {getAvailableSemesters().map((sem) => {
+                  const actualSemester = (parseInt(formData.year) - 1) * 2 + sem;
+                  return (
+                    <option key={sem} value={sem}>
+                      Semester {actualSemester}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
