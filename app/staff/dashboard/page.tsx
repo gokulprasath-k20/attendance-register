@@ -36,7 +36,9 @@ export default function StaffDashboard() {
   const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
   const [otpExpiry, setOtpExpiry] = useState<string | null>(null);
   const [availableSubjects, setAvailableSubjects] = useState<string[]>([]);
+  const [staffSubjects, setStaffSubjects] = useState<string[]>([]);
   const [historyFilters, setHistoryFilters] = useState({
+    subject: '',
     year: '',
     semester: '',
     status: '',
@@ -44,6 +46,7 @@ export default function StaffDashboard() {
     endDate: '',
   });
   const [tempFilters, setTempFilters] = useState({
+    subject: '',
     year: '',
     semester: '',
     status: '',
@@ -52,12 +55,30 @@ export default function StaffDashboard() {
   });
   const { toast, showToast, closeToast } = useToast();
 
+  // Fetch staff profile to get their subjects
+  const { data: profileData } = useQuery({
+    queryKey: ['staff-profile'],
+    queryFn: async () => {
+      const response = await fetch('/api/auth/profile');
+      if (!response.ok) throw new Error('Failed to fetch profile');
+      return response.json();
+    },
+  });
+
+  // Set staff subjects from profile
+  useEffect(() => {
+    if (profileData?.profile?.subjects) {
+      setStaffSubjects(profileData.profile.subjects);
+    }
+  }, [profileData]);
+
   const applyFilters = () => {
     setHistoryFilters(tempFilters);
   };
 
   const clearFilters = () => {
     setTempFilters({
+      subject: '',
       year: '',
       semester: '',
       status: '',
@@ -65,6 +86,7 @@ export default function StaffDashboard() {
       endDate: '',
     });
     setHistoryFilters({
+      subject: '',
       year: '',
       semester: '',
       status: '',
@@ -74,22 +96,27 @@ export default function StaffDashboard() {
   };
 
   // Update available subjects when year and semester change
+  // Filter to only show subjects that the staff teaches
   useEffect(() => {
-    if (formData.year && formData.semester) {
-      const subjects = getSubjectsForYearAndSemester(
+    if (formData.year && formData.semester && staffSubjects.length > 0) {
+      const yearSemesterSubjects = getSubjectsForYearAndSemester(
         parseInt(formData.year),
         parseInt(formData.semester)
       );
-      setAvailableSubjects(subjects);
+      // Only show subjects that staff teaches AND are in the selected year/semester
+      const filteredSubjects = yearSemesterSubjects.filter(subject => 
+        staffSubjects.includes(subject)
+      );
+      setAvailableSubjects(filteredSubjects);
       // Reset subject if not available in new selection
-      if (formData.subject && !subjects.includes(formData.subject)) {
+      if (formData.subject && !filteredSubjects.includes(formData.subject)) {
         setFormData(prev => ({ ...prev, subject: '' }));
       }
     } else {
       setAvailableSubjects([]);
       setFormData(prev => ({ ...prev, subject: '' }));
     }
-  }, [formData.year, formData.semester, formData.subject]);
+  }, [formData.year, formData.semester, formData.subject, staffSubjects]);
 
   const { data: attendanceData } = useQuery({
     queryKey: ['staff-attendance'],
@@ -99,6 +126,14 @@ export default function StaffDashboard() {
       return response.json();
     },
   });
+
+  // Filter attendance records to only show the staff's subjects
+  const filteredAttendanceRecords = attendanceData?.attendance?.filter(
+    (record: AttendanceRecord) => {
+      const recordSubject = record.otp_sessions?.subject;
+      return recordSubject && staffSubjects.includes(recordSubject);
+    }
+  ) || [];
 
   const generateOTPMutation = useMutation({
     mutationFn: async (data: { latitude: number; longitude: number; subject: string; year: string; semester: string; period?: string }) => {
@@ -145,9 +180,9 @@ export default function StaffDashboard() {
   };
 
   const handleExportExcel = () => {
-    if (!attendanceData?.attendance) return;
+    if (filteredAttendanceRecords.length === 0) return;
 
-    const records = attendanceData.attendance.map((record: AttendanceRecord) => ({
+    const records = filteredAttendanceRecords.map((record: AttendanceRecord) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
@@ -161,9 +196,9 @@ export default function StaffDashboard() {
   };
 
   const handleExportPDF = () => {
-    if (!attendanceData?.attendance) return;
+    if (filteredAttendanceRecords.length === 0) return;
 
-    const records = attendanceData.attendance.map((record: AttendanceRecord) => ({
+    const records = filteredAttendanceRecords.map((record: AttendanceRecord) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
@@ -192,6 +227,20 @@ export default function StaffDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Generate Attendance OTP
             </h2>
+            {staffSubjects.length > 0 && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Your Subjects:</strong> {staffSubjects.join(', ')}
+                </p>
+              </div>
+            )}
+            {staffSubjects.length === 0 && profileData && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> No subjects assigned to your account. Please contact administrator to assign subjects.
+                </p>
+              </div>
+            )}
             <form onSubmit={handleGenerateOTP} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
@@ -355,7 +404,25 @@ export default function StaffDashboard() {
 
             {/* History Filters */}
             <div className="p-4 bg-gray-50 rounded-lg mb-4">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-3">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Subject
+                  </label>
+                  <select
+                    value={tempFilters.subject}
+                    onChange={(e) => setTempFilters({ ...tempFilters, subject: e.target.value })}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">All Subjects</option>
+                    {staffSubjects.map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">
                     Year
@@ -474,9 +541,10 @@ export default function StaffDashboard() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {attendanceData.attendance
+                    {filteredAttendanceRecords
                       .filter((record: AttendanceRecord) => {
                         // Apply filters
+                        if (historyFilters.subject && record.otp_sessions?.subject !== historyFilters.subject) return false;
                         if (historyFilters.year && record.otp_sessions?.year?.toString() !== historyFilters.year) return false;
                         if (historyFilters.semester && record.otp_sessions?.semester?.toString() !== historyFilters.semester) return false;
                         if (historyFilters.status && record.status !== historyFilters.status) return false;
