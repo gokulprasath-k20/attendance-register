@@ -16,6 +16,9 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 export const ROUTES = {
   HOME: '/',
   SIGNIN: '/auth/signin',
+  ADMIN_SIGNIN: '/auth/admin/signin',
+  STAFF_SIGNIN: '/auth/staff/signin',
+  STUDENT_SIGNIN: '/auth/student/signin',
   ADMIN_SIGNUP: '/auth/admin/signup',
   STAFF_SIGNUP: '/auth/staff/signup',
   STUDENT_SIGNUP: '/auth/student/signup',
