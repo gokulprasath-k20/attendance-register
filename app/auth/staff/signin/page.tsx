@@ -19,11 +19,18 @@ export default function StaffSignIn() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
+      // Add timeout to signIn call
+      const signInPromise = signIn('credentials', {
         email,
         password,
         redirect: false,
       });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('SignIn timeout')), 15000)
+      );
+      
+      const result = await Promise.race([signInPromise, timeoutPromise]) as any;
 
       if (result?.error) {
         showToast('Invalid credentials', 'error');
@@ -53,9 +60,11 @@ export default function StaffSignIn() {
       router.push('/staff/dashboard');
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        showToast('Request timed out. Please try again.', 'error');
+        showToast('Session check timed out. Please try again.', 'error');
+      } else if (error.message === 'SignIn timeout') {
+        showToast('Sign in timed out. Please check your connection and try again.', 'error');
       } else {
-        showToast('An error occurred', 'error');
+        showToast('An error occurred during sign in', 'error');
       }
       setIsLoading(false);
     }

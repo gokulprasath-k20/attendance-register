@@ -11,6 +11,7 @@ export default function StudentSignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   const { toast, showToast, closeToast } = useToast();
   const router = useRouter();
 
@@ -19,11 +20,20 @@ export default function StudentSignIn() {
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
+      setLoadingMessage('Signing in...');
+      
+      // Add timeout to signIn call
+      const signInPromise = signIn('credentials', {
         email,
         password,
         redirect: false,
       });
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('SignIn timeout')), 15000)
+      );
+      
+      const result = await Promise.race([signInPromise, timeoutPromise]) as any;
 
       if (result?.error) {
         showToast('Invalid credentials', 'error');
@@ -31,6 +41,8 @@ export default function StudentSignIn() {
         return;
       }
 
+      setLoadingMessage('Verifying account...');
+      
       // Verify student role after signin
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -53,11 +65,14 @@ export default function StudentSignIn() {
       router.push('/student');
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        showToast('Request timed out. Please try again.', 'error');
+        showToast('Session check timed out. Please try again.', 'error');
+      } else if (error.message === 'SignIn timeout') {
+        showToast('Sign in timed out. Please check your connection and try again.', 'error');
       } else {
-        showToast('An error occurred', 'error');
+        showToast('An error occurred during sign in', 'error');
       }
       setIsLoading(false);
+      setLoadingMessage('');
     }
   };
 
@@ -108,7 +123,14 @@ export default function StudentSignIn() {
             disabled={isLoading}
             className="w-full bg-[#8B44F7] text-white py-3 rounded-lg font-medium hover:bg-[#7c3aed] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isLoading ? <LoadingSpinner size="sm" /> : 'Sign In as Student'}
+{isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <LoadingSpinner size="sm" />
+                <span>{loadingMessage || 'Signing in...'}</span>
+              </div>
+            ) : (
+              'Sign In as Student'
+            )}
           </button>
         </form>
 
