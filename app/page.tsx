@@ -81,65 +81,6 @@ export default function Home() {
               </div>
             </div>
           </div>
-
-          {/* Features Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <div className="text-4xl mb-4">📍</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Geolocation Verification
-              </h3>
-              <p className="text-gray-600">
-                Accurate attendance tracking using GPS location verification
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <div className="text-4xl mb-4">🔐</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                OTP-Based System
-              </h3>
-              <p className="text-gray-600">
-                Secure time-limited OTP codes for attendance marking
-              </p>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <div className="text-4xl mb-4">📊</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Comprehensive Reports
-              </h3>
-              <p className="text-gray-600">
-                Export attendance data to Excel and PDF formats
-              </p>
-            </div>
-          </div>
-
-          {/* Student Features */}
-          <div className="mt-16 bg-white rounded-xl shadow-2xl p-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
-              Student Features
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div className="p-6 bg-purple-50 rounded-lg">
-                <h3 className="text-xl font-bold text-[#8B44F7] mb-3">📱 Easy Attendance</h3>
-                <ul className="text-gray-700 space-y-2 text-left">
-                  <li>• Mark attendance with OTP</li>
-                  <li>• GPS-based verification</li>
-                  <li>• Real-time status updates</li>
-                </ul>
-              </div>
-
-              <div className="p-6 bg-purple-50 rounded-lg">
-                <h3 className="text-xl font-bold text-[#8B44F7] mb-3">📊 Track Progress</h3>
-                <ul className="text-gray-700 space-y-2 text-left">
-                  <li>• View attendance history</li>
-                  <li>• Check attendance status</li>
-                  <li>• Monitor your records</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
