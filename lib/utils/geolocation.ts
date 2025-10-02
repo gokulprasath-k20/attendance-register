@@ -43,8 +43,8 @@ export const getCurrentLocation = (): Promise<Coordinates> => {
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 30000, // Increased timeout for better accuracy
+        maximumAge: 0, // Don't use cached position
       }
     );
   });
