@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
+import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
 
 export default function AdminDashboard() {
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-50">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       <Navbar />
       
@@ -88,7 +89,9 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {attendanceData ? (
+            {!attendanceData ? (
+              <AttendanceTableSkeleton rows={10} />
+            ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-purple-50">
@@ -153,8 +156,6 @@ export default function AdminDashboard() {
                   </tbody>
                 </table>
               </div>
-            ) : (
-              <LoadingSpinner />
             )}
           </div>
         </div>

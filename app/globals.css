@@ -41,6 +41,7 @@
 
 body {
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  background-color: #fafafa;
 }
 
 /* Custom scrollbar */

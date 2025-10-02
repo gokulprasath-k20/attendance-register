@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
+import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { getCurrentLocation } from '@/lib/utils/geolocation';
 import { formatDistance } from '@/lib/utils/geolocation';
 import { getSubjectsForYearAndSemester } from '@/lib/utils/subjects';
@@ -128,7 +129,7 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-50">
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       <Navbar />
       
@@ -287,7 +288,9 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {attendanceData ? (
+            {!attendanceData ? (
+              <AttendanceTableSkeleton rows={8} />
+            ) : (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-purple-50">
@@ -349,8 +352,6 @@ export default function StudentDashboard() {
                   </tbody>
                 </table>
               </div>
-            ) : (
-              <LoadingSpinner />
             )}
           </div>
         </div>
