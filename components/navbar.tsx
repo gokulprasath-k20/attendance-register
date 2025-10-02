@@ -38,20 +38,26 @@ export default function Navbar() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-20">
           {/* Left side - Navigation Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 sm:space-x-4">
             {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 hover:bg-purple-50 hover:text-[#9B7EBD] px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-gray-700 hover:bg-purple-50 hover:text-[#9B7EBD] px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
               >
-                {item.name}
+                <span className="hidden sm:inline">{item.name}</span>
+                <span className="sm:hidden">
+                  {item.name.includes('Dashboard') ? 'Home' : 
+                   item.name.includes('User') ? 'Users' :
+                   item.name.includes('Attendance') ? 'Records' :
+                   item.name.split(' ')[0]}
+                </span>
               </Link>
             ))}
           </div>
 
           {/* Center - Logo */}
-          <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2">
+          <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2 hidden md:flex">
             {/* College Logo */}
             <div className="flex items-center space-x-3 mb-2">
               <Image
@@ -71,20 +77,33 @@ export default function Navbar() {
             </div>
           </div>
 
+          {/* Mobile Logo - Simplified */}
+          <div className="flex items-center md:hidden absolute left-1/2 transform -translate-x-1/2">
+            <Image
+              src="https://avsec-it.vercel.app/logo.png"
+              alt="AVS Engineering College"
+              width={120}
+              height={36}
+              className="h-8 w-auto"
+              priority
+            />
+          </div>
+
           {/* Right side - User Info & Sign Out */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-gray-700">
-              <span className="text-sm font-medium">{session.user.name}</span>
-              <span className="text-xs bg-[#9B7EBD] text-white px-3 py-1 rounded-full">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-gray-700">
+              <span className="text-xs sm:text-sm font-medium truncate max-w-20 sm:max-w-none">{session.user.name}</span>
+              <span className="text-xs bg-[#9B7EBD] text-white px-2 sm:px-3 py-1 rounded-full">
                 {session.user.role}
               </span>
             </div>
 
             <button
               onClick={handleSignOut}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm"
+              className="bg-red-500 hover:bg-red-600 text-white px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-sm"
             >
-              Sign Out
+              <span className="hidden sm:inline">Sign Out</span>
+              <span className="sm:hidden">Out</span>
             </button>
           </div>
         </div>
