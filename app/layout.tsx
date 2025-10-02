@@ -3,18 +3,11 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter'
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Smart Attendance Management System',
-  description: 'Advanced geolocation-based attendance tracking with secure OTP verification. Streamline your institution\'s attendance management with cutting-edge technology.',
-  keywords: 'attendance, management, geolocation, OTP, verification, education, tracking',
-  authors: [{ name: 'Smart Attendance Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+  title: 'Attendance Management System',
+  description: 'Geolocation-based attendance tracking with OTP verification',
 };
 
 export default function RootLayout({
@@ -23,8 +16,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className={`${inter.className} antialiased`}>
+    <html lang="en">
+      <body className={inter.className}>
         <Providers>{children}</Providers>
       </body>
     </html>
