@@ -155,18 +155,21 @@ export const isGeolocationAvailable = (): boolean => {
  * @returns Formatted string
  */
 export const formatDistance = (meters: number): string => {
-  // If distance is beyond 10 meters, show "Too far" instead of actual distance
-  if (meters > 10) {
-    return "Too far";
+  // Round to 1 decimal place for consistent display
+  const roundedDistance = Math.round(meters * 10) / 10;
+  
+  // If distance is beyond 10.0 meters, show "Too far" with actual distance
+  if (roundedDistance > 10.0) {
+    return `Too far (${roundedDistance}m)`;
   }
   
   // For very small distances (< 1m), show millimeter precision
-  if (meters < 1) {
-    return `${(meters * 1000).toFixed(0)} mm`;
+  if (roundedDistance < 1) {
+    return `${(roundedDistance * 1000).toFixed(0)} mm`;
   }
   
-  // For distances 1-10m, show centimeter precision
-  return `${meters.toFixed(3)} m`;
+  // For distances 1-10m, show 1 decimal place precision
+  return `${roundedDistance.toFixed(1)} m`;
 };
 
 /**

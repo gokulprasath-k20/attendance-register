@@ -155,8 +155,9 @@ export default function StudentDashboard() {
             'success'
           );
         } else {
+          const actualDistance = data.attendance.distance.toFixed(1);
           showToast(
-            `❌ Attendance marked: ${statusText} - You are too far from the staff location`,
+            `❌ Attendance marked: ${statusText} - Distance: ${actualDistance}m (Must be ≤ 10.0m)`,
             'error'
           );
         }
@@ -264,7 +265,10 @@ export default function StudentDashboard() {
             </h2>
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-sm text-green-800">
-                <strong>📍 10-Meter Rule:</strong> You must be within 10 meters of your staff's location to be marked present. Make sure you're close to your teacher before submitting the OTP.
+                <strong>📍 STRICT 10-Meter Rule:</strong> You must be exactly 10.0 meters or closer to your staff's location to be marked present.
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                ⚠️ <strong>Important:</strong> 10.1m or 11m = ABSENT. Distance must be ≤ 10.0m for attendance.
               </p>
               <p className="text-xs text-green-600 mt-1">
                 ⚡ Optimized for quick attendance marking - location will be obtained instantly.

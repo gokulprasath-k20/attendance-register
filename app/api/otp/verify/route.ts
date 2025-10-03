@@ -118,11 +118,20 @@ export async function POST(request: NextRequest) {
     console.log('Within 10m radius:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
     console.log('=== END DEBUG ===');
 
-    // Determine status
+    // Determine status - STRICT 10-meter rule (exactly 10.0m or less)
+    // Round distance to 1 decimal place for precise comparison
+    const roundedDistance = Math.round(distance * 10) / 10;
     const status =
-      distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
+      roundedDistance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
         ? ATTENDANCE_CONFIG.STATUS.PRESENT
         : ATTENDANCE_CONFIG.STATUS.ABSENT;
+    
+    console.log('Distance validation:');
+    console.log('  Raw distance:', distance.toFixed(6), 'meters');
+    console.log('  Rounded distance:', roundedDistance, 'meters');
+    console.log('  Max allowed:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('  Status:', status === 'P' ? 'PRESENT' : 'ABSENT');
+    console.log('  Rule: Distance must be ≤ 10.0m (10.1m = ABSENT)');
 
     // Mark attendance
     const { data: attendance, error: attendanceError } = await supabase
