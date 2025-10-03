@@ -1,6 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @layer base {
   :root {
@@ -18,14 +19,130 @@
 }
 
 body {
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  line-height: 1.4;
   background-color: #fafafa;
+}
+
+/* Compact typography system */
+h1, .text-3xl, .text-2xl, .text-xl {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 18px; }
+h3 { font-size: 16px; }
+h4 { font-size: 15px; }
+h5 { font-size: 14px; }
+h6 { font-size: 13px; }
+
+/* Compact text sizes */
+.text-xs { font-size: 10px; }
+.text-sm { font-size: 12px; }
+.text-base { font-size: 14px; }
+.text-lg { font-size: 15px; }
+.text-xl { font-size: 16px; }
+.text-2xl { font-size: 18px; }
+.text-3xl { font-size: 20px; }
+
+/* Compact spacing */
+.p-1 { padding: 0.125rem; }
+.p-2 { padding: 0.25rem; }
+.p-3 { padding: 0.375rem; }
+.p-4 { padding: 0.5rem; }
+.p-6 { padding: 0.75rem; }
+.p-8 { padding: 1rem; }
+
+.m-1 { margin: 0.125rem; }
+.m-2 { margin: 0.25rem; }
+.m-3 { margin: 0.375rem; }
+.m-4 { margin: 0.5rem; }
+.m-6 { margin: 0.75rem; }
+.m-8 { margin: 1rem; }
+
+/* Compact container styles */
+.container {
+  max-width: 95%;
+  padding: 0.5rem;
+}
+
+/* Compact panels and cards */
+.panel, .card, [class*="bg-white"], [class*="bg-gray"] {
+  padding: 0.5rem !important;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact form elements */
+input, select, textarea, button {
+  font-family: 'Playfair Display', serif !important;
+  font-size: 13px !important;
+  padding: 0.375rem 0.5rem !important;
+  border-radius: 0.25rem;
+}
+
+/* Compact buttons */
+button, .btn {
+  font-size: 12px !important;
+  padding: 0.25rem 0.75rem !important;
+  min-height: 32px;
+}
+
+/* Compact tables */
+table {
+  font-size: 12px;
+}
+
+th, td {
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* Compact navigation */
+nav {
+  padding: 0.5rem 1rem !important;
+}
+
+nav a, nav button {
+  font-size: 13px !important;
+  padding: 0.25rem 0.5rem !important;
+}
+
+/* Compact dashboard sections */
+.dashboard-section {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+}
+
+.dashboard-card {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Compact modals and dialogs */
+.modal, .dialog {
+  padding: 1rem !important;
+}
+
+.modal-header {
+  padding: 0.5rem !important;
+  font-size: 16px !important;
+}
+
+.modal-body {
+  padding: 0.75rem !important;
+}
+
+.modal-footer {
+  padding: 0.5rem !important;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -34,9 +151,29 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #8B44F7;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #7c3aed;
+}
+
+/* Responsive compact adjustments */
+@media (max-width: 768px) {
+  body {
+    font-size: 13px;
+  }
+  
+  .container {
+    padding: 0.25rem;
+  }
+  
+  .panel, .card {
+    padding: 0.375rem !important;
+  }
+  
+  input, select, textarea, button {
+    font-size: 12px !important;
+    padding: 0.25rem 0.375rem !important;
+  }
 }

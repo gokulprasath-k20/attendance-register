@@ -8,6 +8,35 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'playfair': ['Playfair Display', 'serif'],
+        'sans': ['Playfair Display', 'serif'],
+      },
+      fontSize: {
+        'xs': ['10px', '1.3'],
+        'sm': ['12px', '1.4'],
+        'base': ['14px', '1.4'],
+        'lg': ['15px', '1.4'],
+        'xl': ['16px', '1.3'],
+        '2xl': ['18px', '1.2'],
+        '3xl': ['20px', '1.2'],
+        '4xl': ['22px', '1.1'],
+        '5xl': ['24px', '1.1'],
+      },
+      spacing: {
+        '1': '0.125rem',
+        '2': '0.25rem',
+        '3': '0.375rem',
+        '4': '0.5rem',
+        '5': '0.625rem',
+        '6': '0.75rem',
+        '8': '1rem',
+        '10': '1.25rem',
+        '12': '1.5rem',
+        '16': '2rem',
+        '20': '2.5rem',
+        '24': '3rem',
+      },
       colors: {
         lavender: {
           50: '#f5f3ff',
