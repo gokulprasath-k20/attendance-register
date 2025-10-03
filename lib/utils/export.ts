@@ -52,16 +52,54 @@ export const exportToExcel = async (
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Attendance Report');
 
-  // Try to add logo image
+  // Create header with college branding like the image
+  worksheet.mergeCells('A1:I3');
+  const headerCell = worksheet.getCell('A1');
+  
+  // Add college header with logos and text
+  headerCell.value = 'AVS ENGINEERING COLLEGE\nDepartment of Information Technology';
+  headerCell.font = { 
+    bold: true, 
+    size: 20, 
+    color: { argb: 'FF0066CC' }, // Blue color like in image
+    name: 'Arial'
+  };
+  headerCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+  headerCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFFFFFFF' }, // White background
+  };
+
+  // Add border to header
+  headerCell.border = {
+    top: { style: 'thick', color: { argb: 'FF000000' } },
+    left: { style: 'thick', color: { argb: 'FF000000' } },
+    bottom: { style: 'thick', color: { argb: 'FF000000' } },
+    right: { style: 'thick', color: { argb: 'FF000000' } }
+  };
+
+  // Add logo images
   try {
     const logoBase64 = await getLogoBase64();
     if (logoBase64) {
-      const logoId = workbook.addImage({
+      // Left logo
+      const leftLogoId = workbook.addImage({
         base64: logoBase64,
         extension: 'png',
       });
-      worksheet.addImage(logoId, {
+      worksheet.addImage(leftLogoId, {
         tl: { col: 0, row: 0 },
+        ext: { width: 60, height: 60 }
+      });
+
+      // Right logo (same logo for now, you can change this)
+      const rightLogoId = workbook.addImage({
+        base64: logoBase64,
+        extension: 'png',
+      });
+      worksheet.addImage(rightLogoId, {
+        tl: { col: 7.5, row: 0 },
         ext: { width: 60, height: 60 }
       });
     }
@@ -69,34 +107,21 @@ export const exportToExcel = async (
     console.log('Could not load logo for Excel export:', error);
   }
 
-  // Add college header with logo space
-  worksheet.mergeCells('A1:H3');
-  const headerCell = worksheet.getCell('A1');
-  headerCell.value = 'COLLEGE ATTENDANCE MANAGEMENT SYSTEM\nAttendance Report\nGenerated on: ' + new Date().toLocaleDateString();
-  headerCell.font = { bold: true, size: 16, color: { argb: 'FF9B7EBD' } };
-  headerCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
-  headerCell.fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: 'FFF8F8FF' }, // Ghost white
-  };
+  // Add college logo note
+  worksheet.getCell('A4').value = 'College Logo: logo (1).png';
+  worksheet.getCell('A4').font = { size: 10, italic: true, color: { argb: 'FF666666' } };
+  worksheet.getCell('A4').alignment = { horizontal: 'left' };
 
-  // Add logo image (logo (1).png) - Note: In browser environment, you would need to convert image to base64
-  // For now, we'll add a note about the logo placement
-  worksheet.getCell('A4').value = '📋 College Logo: logo (1).png';
-  worksheet.getCell('A4').font = { size: 10, italic: true };
-  worksheet.getCell('A4').alignment = { horizontal: 'center' };
-
-  // Set column widths starting from row 5
+  // Set column headers starting from row 5 (like in the image)
   worksheet.getRow(5).values = [
     'Student Name', 'Reg No', 'Subject', 'Year', 'Date', 'Time', 'Status', 'Distance (m)'
   ];
   
   worksheet.columns = [
-    { key: 'studentName', width: 25 },
-    { key: 'regNo', width: 15 },
-    { key: 'subject', width: 20 },
-    { key: 'year', width: 10 },
+    { key: 'studentName', width: 15 },
+    { key: 'regNo', width: 18 },
+    { key: 'subject', width: 12 },
+    { key: 'year', width: 8 },
     { key: 'date', width: 12 },
     { key: 'time', width: 10 },
     { key: 'status', width: 10 },
@@ -104,13 +129,23 @@ export const exportToExcel = async (
   ];
 
   // Style column header row (row 5)
-  worksheet.getRow(5).font = { bold: true, size: 12 };
+  worksheet.getRow(5).font = { bold: true, size: 11 };
   worksheet.getRow(5).fill = {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'FFE6E6FA' }, // Lavender
+    fgColor: { argb: 'FFE6E6FA' }, // Light gray like in image
   };
   worksheet.getRow(5).alignment = { vertical: 'middle', horizontal: 'center' };
+  
+  // Add borders to header row
+  worksheet.getRow(5).eachCell((cell) => {
+    cell.border = {
+      top: { style: 'thin', color: { argb: 'FF000000' } },
+      left: { style: 'thin', color: { argb: 'FF000000' } },
+      bottom: { style: 'thin', color: { argb: 'FF000000' } },
+      right: { style: 'thin', color: { argb: 'FF000000' } }
+    };
+  });
 
   // Add data rows starting from row 6
   let currentRow = 6;
@@ -128,9 +163,19 @@ export const exportToExcel = async (
     ];
     currentRow++;
     
-    // Color code status
-    const statusCell = row.getCell('status');
-    if (record.status === 'P') {
+    // Add borders to all cells in the row
+    row.eachCell((cell) => {
+      cell.border = {
+        top: { style: 'thin', color: { argb: 'FF000000' } },
+        left: { style: 'thin', color: { argb: 'FF000000' } },
+        bottom: { style: 'thin', color: { argb: 'FF000000' } },
+        right: { style: 'thin', color: { argb: 'FF000000' } }
+      };
+    });
+    
+    // Color code status like in the image
+    const statusCell = row.getCell(7); // Status column
+    if (record.status === 'Present') {
       statusCell.fill = {
         type: 'pattern',
         pattern: 'solid',
@@ -181,30 +226,43 @@ export const exportToPDF = async (
 ) => {
   const doc = new jsPDF();
 
-  // Try to add logo image
+  // Add college header matching Excel format
+  doc.setFontSize(18);
+  doc.setTextColor(0, 102, 204); // Blue color
+  doc.text('AVS ENGINEERING COLLEGE', 105, 15, { align: 'center' });
+  
+  // Add department name
+  doc.setFontSize(14);
+  doc.setTextColor(0, 102, 204); // Blue color
+  doc.text('Department of Information Technology', 105, 25, { align: 'center' });
+  
+  // Add logos matching Excel layout
   try {
     const logoBase64 = await getLogoBase64();
     if (logoBase64) {
-      doc.addImage(logoBase64, 'PNG', 14, 7, 20, 20);
+      // Left logo
+      doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
+      // Right logo  
+      doc.addImage(logoBase64, 'PNG', 175, 8, 20, 20);
     }
   } catch (error) {
     console.log('Could not load logo for PDF export:', error);
   }
 
-  // Add college header
-  doc.setFontSize(20);
-  doc.setTextColor(155, 126, 189); // Purple theme
-  doc.text('COLLEGE ATTENDANCE MANAGEMENT SYSTEM', 105, 15, { align: 'center' });
+  // Add border around header area
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.5);
+  doc.rect(10, 5, 190, 25);
 
-  // Add title
-  doc.setFontSize(16);
+  // Add title below header
+  doc.setFontSize(14);
   doc.setTextColor(0, 0, 0);
-  doc.text(title, 105, 30, { align: 'center' });
+  doc.text(title, 105, 40, { align: 'center' });
 
   // Add metadata
   doc.setFontSize(10);
-  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 45);
-  doc.text(`Total Records: ${data.length}`, 14, 51);
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 50);
+  doc.text(`Total Records: ${data.length}`, 14, 55);
 
   // Prepare table data with year column
   const tableData = data.map((record) => [
@@ -222,7 +280,7 @@ export const exportToPDF = async (
   autoTable(doc, {
     head: [['Student Name', 'Reg No', 'Subject', 'Year', 'Date', 'Time', 'Status', 'Distance (m)']],
     body: tableData,
-    startY: 60,
+    startY: 65,
     theme: 'striped',
     headStyles: {
       fillColor: [230, 230, 250], // Lavender
