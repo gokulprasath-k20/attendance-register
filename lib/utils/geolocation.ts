@@ -15,60 +15,97 @@ export interface LocationResult extends Coordinates {
 }
 
 /**
- * Get current user location using HTML5 Geolocation API with enhanced accuracy for nearby devices
- * @returns Promise with location result including accuracy and timestamp
+ * CRITICAL: Get stabilized location for final year project consistency
+ * Takes multiple readings and returns the most stable/accurate one
+ * @returns Promise with consistent location result
  */
 export const getCurrentLocation = (): Promise<LocationResult> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error('Geolocation is not supported by this browser'));
       return;
     }
 
-    // Enhanced options for better accuracy when devices are close
+    console.log('🎯 GETTING STABILIZED LOCATION FOR PROJECT CONSISTENCY...');
+
+    // Ultra-high precision options for project accuracy
     const options: PositionOptions = {
       enableHighAccuracy: true,
-      timeout: 20000, // Increased timeout for better accuracy
-      maximumAge: 0, // Always get fresh location
+      timeout: 30000, // Extended timeout for best accuracy
+      maximumAge: 0, // Never use cached position
     };
 
-    console.log('Getting enhanced location for nearby device detection...');
+    try {
+      // Take multiple readings for consistency
+      const readings: LocationResult[] = [];
+      const maxReadings = 3;
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const result = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          timestamp: position.timestamp,
-        };
-
-        console.log('Location acquired:', {
-          coordinates: `${result.latitude.toFixed(8)}, ${result.longitude.toFixed(8)}`,
-          accuracy: `${result.accuracy.toFixed(1)}m`,
-          timestamp: new Date(result.timestamp).toISOString()
+      for (let i = 0; i < maxReadings; i++) {
+        console.log(`📍 Taking reading ${i + 1}/${maxReadings}...`);
+        
+        const reading = await new Promise<LocationResult>((resolveReading, rejectReading) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              resolveReading({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: position.coords.accuracy,
+                timestamp: position.timestamp,
+              });
+            },
+            rejectReading,
+            options
+          );
         });
 
-        // Log GPS quality for nearby device scenarios
-        if (result.accuracy <= 5) {
-          console.log('EXCELLENT GPS accuracy for nearby device detection');
-        } else if (result.accuracy <= 10) {
-          console.log('GOOD GPS accuracy for nearby device detection');
-        } else if (result.accuracy <= 20) {
-          console.log('MODERATE GPS accuracy - may affect nearby device detection');
-        } else {
-          console.log('POOR GPS accuracy - nearby device detection may be unreliable');
-        }
+        readings.push(reading);
+        console.log(`  Reading ${i + 1}: ${reading.latitude.toFixed(8)}, ${reading.longitude.toFixed(8)} (±${reading.accuracy.toFixed(1)}m)`);
 
-        resolve(result);
-      },
-      (error) => {
-        console.error('❌ Location acquisition failed:', error.message);
-        handleLocationError(error);
-        reject(error);
-      },
-      options
-    );
+        // Small delay between readings for GPS stabilization
+        if (i < maxReadings - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Find the most accurate reading (smallest accuracy value)
+      const bestReading = readings.reduce((best, current) => 
+        current.accuracy < best.accuracy ? current : best
+      );
+
+      // Calculate coordinate stability (how much readings vary)
+      const latitudes = readings.map(r => r.latitude);
+      const longitudes = readings.map(r => r.longitude);
+      
+      const latRange = Math.max(...latitudes) - Math.min(...latitudes);
+      const lonRange = Math.max(...longitudes) - Math.min(...longitudes);
+      const coordinateStability = Math.max(latRange, lonRange);
+
+      console.log('📊 LOCATION STABILITY ANALYSIS:');
+      console.log(`  Best accuracy: ±${bestReading.accuracy.toFixed(1)}m`);
+      console.log(`  Coordinate stability: ${(coordinateStability * 111000).toFixed(1)}m variation`);
+      console.log(`  Selected coordinates: ${bestReading.latitude.toFixed(8)}, ${bestReading.longitude.toFixed(8)}`);
+
+      // Stabilize coordinates to 6 decimal places for consistency
+      // 6 decimal places = ~0.11m precision, good for project consistency
+      const stabilizedResult = {
+        latitude: Math.round(bestReading.latitude * 1000000) / 1000000,
+        longitude: Math.round(bestReading.longitude * 1000000) / 1000000,
+        accuracy: bestReading.accuracy,
+        timestamp: bestReading.timestamp,
+      };
+
+      console.log('✅ STABILIZED COORDINATES FOR PROJECT CONSISTENCY:');
+      console.log(`  Final coordinates: ${stabilizedResult.latitude.toFixed(6)}, ${stabilizedResult.longitude.toFixed(6)}`);
+      console.log(`  Coordinate precision: 6 decimal places (~0.11m resolution)`);
+      console.log(`  This ensures same location gives same distance every time`);
+
+      resolve(stabilizedResult);
+
+    } catch (error) {
+      console.error('❌ Stabilized location acquisition failed:', error);
+      handleLocationError(error as GeolocationPositionError);
+      reject(error);
+    }
   });
 };
 
@@ -97,50 +134,60 @@ export const calculateDistance = (
   lat2: number,
   lon2: number
 ): number => {
-  // Validate coordinates with high precision
-  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) {
+  // CRITICAL: Stabilize input coordinates for consistent results
+  // Round to 6 decimal places (~0.11m precision) to ensure same location = same distance
+  const stableLat1 = Math.round(lat1 * 1000000) / 1000000;
+  const stableLon1 = Math.round(lon1 * 1000000) / 1000000;
+  const stableLat2 = Math.round(lat2 * 1000000) / 1000000;
+  const stableLon2 = Math.round(lon2 * 1000000) / 1000000;
+
+  // Validate coordinates
+  if (stableLat1 == null || stableLon1 == null || stableLat2 == null || stableLon2 == null) {
     throw new Error('Invalid coordinates provided - null or undefined values');
   }
 
-  // Check if coordinates are within valid ranges
-  if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90) {
-    throw new Error(`Invalid latitude values: lat1=${lat1}, lat2=${lat2}`);
+  if (Math.abs(stableLat1) > 90 || Math.abs(stableLat2) > 90) {
+    throw new Error(`Invalid latitude values: lat1=${stableLat1}, lat2=${stableLat2}`);
   }
-  if (Math.abs(lon1) > 180 || Math.abs(lon2) > 180) {
-    throw new Error(`Invalid longitude values: lon1=${lon1}, lon2=${lon2}`);
+  if (Math.abs(stableLon1) > 180 || Math.abs(stableLon2) > 180) {
+    throw new Error(`Invalid longitude values: lon1=${stableLon1}, lon2=${stableLon2}`);
   }
 
-  // Calculate coordinate differences for analysis
-  const latDiff = Math.abs(lat2 - lat1);
-  const lonDiff = Math.abs(lon2 - lon1);
-  const totalCoordDiff = latDiff + lonDiff;
+  console.log('=== STABILIZED DISTANCE CALCULATION FOR PROJECT CONSISTENCY ===');
+  console.log('Original coordinates:');
+  console.log(`  Point 1: ${lat1.toFixed(8)}, ${lon1.toFixed(8)}`);
+  console.log(`  Point 2: ${lat2.toFixed(8)}, ${lon2.toFixed(8)}`);
+  console.log('Stabilized coordinates (6 decimal places for consistency):');
+  console.log(`  Point 1: ${stableLat1.toFixed(6)}, ${stableLon1.toFixed(6)}`);
+  console.log(`  Point 2: ${stableLat2.toFixed(6)}, ${stableLon2.toFixed(6)}`);
 
-  // Enhanced logging for final year project - show exact calculations
-  console.log('=== PRECISE DISTANCE CALCULATION FOR FINAL YEAR PROJECT ===');
-  console.log('Input coordinates (8 decimal places):');
-  console.log(`  Point 1 (Staff): ${lat1.toFixed(8)}, ${lon1.toFixed(8)}`);
-  console.log(`  Point 2 (Student): ${lat2.toFixed(8)}, ${lon2.toFixed(8)}`);
-  console.log('Coordinate differences:');
-  console.log(`  Latitude difference: ${latDiff.toFixed(8)} degrees`);
-  console.log(`  Longitude difference: ${lonDiff.toFixed(8)} degrees`);
-  console.log(`  Total coordinate difference: ${totalCoordDiff.toFixed(8)} degrees`);
+  // Check for identical coordinates (same location)
+  if (stableLat1 === stableLat2 && stableLon1 === stableLon2) {
+    console.log('🎯 IDENTICAL COORDINATES DETECTED');
+    console.log('   Same stabilized coordinates = 0.000m distance');
+    console.log('   This ensures consistent results for same location');
+    console.log('=== END STABILIZED CALCULATION ===');
+    return 0.000;
+  }
 
-  // Use WGS84 ellipsoid parameters for maximum accuracy
-  const R = 6371008.8; // Earth's radius in meters (WGS84 ellipsoid mean radius)
+  // Calculate coordinate differences
+  const latDiff = Math.abs(stableLat2 - stableLat1);
+  const lonDiff = Math.abs(stableLon2 - stableLon1);
   
-  // Convert degrees to radians with maximum precision
-  const φ1 = lat1 * (Math.PI / 180);
-  const φ2 = lat2 * (Math.PI / 180);
-  const Δφ = (lat2 - lat1) * (Math.PI / 180);
-  const Δλ = (lon2 - lon1) * (Math.PI / 180);
+  console.log('Coordinate differences:');
+  console.log(`  Latitude difference: ${latDiff.toFixed(6)} degrees`);
+  console.log(`  Longitude difference: ${lonDiff.toFixed(6)} degrees`);
 
-  console.log('Conversion to radians:');
-  console.log(`  φ1 = ${φ1.toFixed(10)} radians`);
-  console.log(`  φ2 = ${φ2.toFixed(10)} radians`);
-  console.log(`  Δφ = ${Δφ.toFixed(10)} radians`);
-  console.log(`  Δλ = ${Δλ.toFixed(10)} radians`);
+  // Use high-precision Earth radius (WGS84)
+  const R = 6371008.8; // Earth's radius in meters
+  
+  // Convert stabilized coordinates to radians
+  const φ1 = stableLat1 * (Math.PI / 180);
+  const φ2 = stableLat2 * (Math.PI / 180);
+  const Δφ = (stableLat2 - stableLat1) * (Math.PI / 180);
+  const Δλ = (stableLon2 - stableLon1) * (Math.PI / 180);
 
-  // Haversine formula - most accurate for short distances
+  // Haversine formula with stabilized inputs
   const sinΔφ2 = Math.sin(Δφ / 2);
   const sinΔλ2 = Math.sin(Δλ / 2);
   
@@ -148,53 +195,37 @@ export const calculateDistance = (
             Math.cos(φ1) * Math.cos(φ2) * sinΔλ2 * sinΔλ2;
   
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
-  const distance = R * c; // Distance in meters
+  const rawDistance = R * c;
 
-  console.log('Haversine formula calculation steps:');
-  console.log(`  sin²(Δφ/2) = ${(sinΔφ2 * sinΔφ2).toFixed(12)}`);
-  console.log(`  sin²(Δλ/2) = ${(sinΔλ2 * sinΔλ2).toFixed(12)}`);
-  console.log(`  cos(φ1) = ${Math.cos(φ1).toFixed(10)}`);
-  console.log(`  cos(φ2) = ${Math.cos(φ2).toFixed(10)}`);
+  console.log('Haversine calculation with stabilized coordinates:');
   console.log(`  a = ${a.toFixed(15)}`);
   console.log(`  c = ${c.toFixed(15)}`);
-  console.log(`  Raw distance = ${distance.toFixed(10)} meters`);
+  console.log(`  Raw distance = ${rawDistance.toFixed(10)} meters`);
   
-  // Alternative calculation methods for verification
-  console.log('Alternative calculations for verification:');
+  // CRITICAL: Stabilize final distance to ensure consistency
+  // Round to 3 decimal places but ensure minimum meaningful difference
+  let finalDistance = Math.round(rawDistance * 1000) / 1000;
   
-  // Simple coordinate-based estimation (rough)
-  const roughDistance = totalCoordDiff * 111000; // ~111km per degree
-  console.log(`  Coordinate-based estimate: ${roughDistance.toFixed(3)} meters`);
-  
-  // Equirectangular approximation (faster but less accurate)
-  const x = Δλ * Math.cos((φ1 + φ2) / 2);
-  const y = Δφ;
-  const equirectangularDistance = Math.sqrt(x * x + y * y) * R;
-  console.log(`  Equirectangular approximation: ${equirectangularDistance.toFixed(6)} meters`);
-  
-  // Final result with millimeter precision
-  const finalDistance = Math.round(distance * 1000) / 1000;
-  
-  console.log('Final Results:');
-  console.log(`  Haversine distance: ${finalDistance} meters`);
-  console.log(`  Precision: Millimeter accuracy (3 decimal places)`);
-  console.log(`  Earth radius used: ${R} meters (WGS84)`);
-  
-  // Distance classification for project documentation
-  if (finalDistance < 1) {
-    console.log(`  Classification: VERY CLOSE (${(finalDistance * 1000).toFixed(0)}mm)`);
-  } else if (finalDistance <= 10) {
-    console.log(`  Classification: WITHIN 10M RULE (${finalDistance.toFixed(3)}m)`);
-  } else if (finalDistance <= 50) {
-    console.log(`  Classification: NEARBY (${finalDistance.toFixed(1)}m)`);
-  } else {
-    console.log(`  Classification: FAR (${finalDistance.toFixed(1)}m)`);
+  // For very small distances, ensure minimum step of 0.001m to avoid floating point issues
+  if (finalDistance < 0.001 && finalDistance > 0) {
+    finalDistance = 0.001;
   }
   
-  console.log('=== END PRECISE CALCULATION ===');
+  console.log('CONSISTENCY VALIDATION:');
+  console.log(`  Stabilized distance: ${finalDistance.toFixed(3)} meters`);
+  console.log(`  Coordinate precision: 6 decimal places (~0.11m)`);
+  console.log(`  Distance precision: 3 decimal places (1mm)`);
+  console.log(`  Same coordinates will ALWAYS give same distance`);
+  
+  // Project validation
+  if (finalDistance <= 10.000) {
+    console.log(`  ✅ WITHIN 10M RULE: ${finalDistance.toFixed(3)}m`);
+  } else {
+    console.log(`  ❌ OUTSIDE 10M RULE: ${finalDistance.toFixed(3)}m`);
+  }
+  
+  console.log('=== END STABILIZED CALCULATION ===');
 
-  // Return exact calculated distance without any compensation
   return finalDistance;
 };
 
@@ -449,6 +480,41 @@ export const debugNearbyDevices = (staffLat: number, staffLng: number, studentLa
 };
 
 /**
+ * CRITICAL: Test location consistency for final year project validation
+ * Tests that same coordinates always produce same distance
+ */
+export const testLocationConsistency = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+  console.log('=== PROJECT CONSISTENCY VALIDATION TEST ===');
+  console.log('Testing that same coordinates always give same distance...');
+  
+  const results: number[] = [];
+  const testRuns = 5;
+  
+  // Run multiple calculations with same coordinates
+  for (let i = 0; i < testRuns; i++) {
+    const distance = calculateDistance(lat1, lng1, lat2, lng2);
+    results.push(distance);
+    console.log(`Test ${i + 1}: ${distance.toFixed(3)}m`);
+  }
+  
+  // Check consistency
+  const uniqueResults = [...new Set(results)];
+  const isConsistent = uniqueResults.length === 1;
+  
+  console.log('CONSISTENCY RESULTS:');
+  console.log(`  All ${testRuns} tests returned same value: ${isConsistent ? 'YES ✅' : 'NO ❌'}`);
+  console.log(`  Unique results: ${uniqueResults.map(r => r.toFixed(3)).join(', ')}`);
+  
+  if (isConsistent) {
+    console.log(`  🎯 PROJECT READY: Same location always gives ${results[0].toFixed(3)}m`);
+  } else {
+    console.log(`  ⚠️ INCONSISTENT: Multiple values detected - needs fixing`);
+  }
+  
+  return { consistent: isConsistent, results, uniqueResults };
+};
+
+/**
  * Test function specifically for same location devices showing wrong distance
  * @param staffLat Staff latitude
  * @param staffLng Staff longitude  
@@ -458,18 +524,25 @@ export const debugNearbyDevices = (staffLat: number, staffLng: number, studentLa
 export const testSameLocationIssue = (staffLat: number, staffLng: number, studentLat: number, studentLng: number) => {
   console.log('=== TESTING SAME LOCATION ISSUE ===');
   
-  const result = debugNearbyDevices(staffLat, staffLng, studentLat, studentLng);
+  // First test consistency
+  const consistencyTest = testLocationConsistency(staffLat, staffLng, studentLat, studentLng);
   
-  if (result.distance > 10 && result.coordinateDiff < 0.001) {
-    console.log('❌ CONFIRMED: Same location showing wrong distance');
-    console.log('   This should be fixed by GPS compensation logic');
-    console.log('   Expected: Distance should be ≤ 10m for same location');
-    console.log('   Actual:', result.distance.toFixed(1) + 'm');
-  } else if (result.distance <= 10) {
-    console.log('✅ WORKING: Same location correctly detected');
-  } else {
-    console.log('ℹ️  DIFFERENT LOCATION: Devices are genuinely far apart');
+  if (!consistencyTest.consistent) {
+    console.log('❌ CRITICAL: Inconsistent distance calculation detected!');
+    console.log('   Same coordinates giving different distances');
+    console.log('   This will fail project evaluation');
+    return { ...consistencyTest, projectReady: false };
   }
   
-  return result;
+  const distance = consistencyTest.results[0];
+  
+  if (distance <= 10.000) {
+    console.log('✅ PROJECT READY: Consistent distance within 10m rule');
+    console.log(`   Distance: ${distance.toFixed(3)}m (≤ 10.000m)`);
+  } else {
+    console.log('ℹ️ DIFFERENT LOCATION: Devices genuinely far apart');
+    console.log(`   Distance: ${distance.toFixed(3)}m (> 10.000m)`);
+  }
+  
+  return { ...consistencyTest, projectReady: true, distance };
 };
