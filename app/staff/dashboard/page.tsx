@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { getCurrentLocation, getAccurateLocation } from '@/lib/utils/geolocation';
+import { handleNetworkError, logError } from '@/lib/utils/error-handler';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
 import { getSubjectsForYearAndSemester, getSemesterLabel } from '@/lib/utils/subjects';
@@ -185,7 +186,9 @@ export default function StaffDashboard() {
         period: formData.period,
       });
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Failed to get location', 'error');
+      logError(error instanceof Error ? error : new Error(String(error)), 'STAFF_GENERATE_OTP');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get location for OTP generation';
+      showToast(errorMessage, 'error');
     }
   };
 

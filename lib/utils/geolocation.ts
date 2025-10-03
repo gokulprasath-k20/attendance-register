@@ -3,6 +3,8 @@
  * Functions for handling geolocation and distance calculations
  */
 
+import { logError, handleLocationError, retryOperation } from './error-handler';
+
 export interface Coordinates {
   latitude: number;
   longitude: number;
@@ -39,20 +41,8 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
         resolve(result);
       },
       (error) => {
-        console.error('Geolocation error:', error);
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            reject(new Error('Location permission denied. Please enable location access and try again.'));
-            break;
-          case error.POSITION_UNAVAILABLE:
-            reject(new Error('Location information unavailable. Please check your GPS/network connection.'));
-            break;
-          case error.TIMEOUT:
-            reject(new Error('Location request timed out. Please try again.'));
-            break;
-          default:
-            reject(new Error('An unknown error occurred while getting your location.'));
-        }
+        const errorMessage = handleLocationError(error);
+        reject(new Error(errorMessage));
       },
       {
         enableHighAccuracy: true,
@@ -203,63 +193,68 @@ export const isDistanceReasonable = (distance: number, accuracy: number): boolea
  * @returns Promise with best location result
  */
 export const getAccurateLocation = async (attempts: number = 5): Promise<LocationResult> => {
-  const locations: LocationResult[] = [];
-  
-  console.log(`=== GETTING HIGH-PRECISION LOCATION (${attempts} attempts) ===`);
-  
-  for (let i = 0; i < attempts; i++) {
-    try {
-      console.log(`Location attempt ${i + 1}/${attempts}...`);
-      const location = await getCurrentLocation();
-      locations.push(location);
-      
-      console.log(`Attempt ${i + 1} result:`, {
-        lat: location.latitude.toFixed(8),
-        lng: location.longitude.toFixed(8),
-        accuracy: location.accuracy.toFixed(1) + 'm'
-      });
-      
-      // If we get a very accurate reading (≤5m), use it immediately
-      if (location.accuracy <= 5) {
-        console.log('✅ Excellent accuracy achieved:', location.accuracy.toFixed(1) + 'm');
-        return location;
-      }
-      
-      // If we get good accuracy (≤10m) and it's not the first attempt, use it
-      if (location.accuracy <= 10 && i > 0) {
-        console.log('✅ Good accuracy achieved:', location.accuracy.toFixed(1) + 'm');
-        return location;
-      }
-      
-      // Wait between attempts for GPS to stabilize
-      if (i < attempts - 1) {
-        console.log('Waiting 3 seconds for GPS to stabilize...');
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-    } catch (error) {
-      console.warn(`❌ Location attempt ${i + 1} failed:`, error);
-      if (i === attempts - 1 && locations.length === 0) {
-        throw error;
+  return retryOperation(async () => {
+    const locations: LocationResult[] = [];
+    
+    console.log(`=== GETTING HIGH-PRECISION LOCATION (${attempts} attempts) ===`);
+    
+    for (let i = 0; i < attempts; i++) {
+      try {
+        console.log(`Location attempt ${i + 1}/${attempts}...`);
+        const location = await getCurrentLocation();
+        locations.push(location);
+        
+        console.log(`Attempt ${i + 1} result:`, {
+          lat: location.latitude.toFixed(8),
+          lng: location.longitude.toFixed(8),
+          accuracy: location.accuracy.toFixed(1) + 'm'
+        });
+        
+        // If we get a very accurate reading (≤5m), use it immediately
+        if (location.accuracy <= 5) {
+          console.log('✅ Excellent accuracy achieved:', location.accuracy.toFixed(1) + 'm');
+          return location;
+        }
+        
+        // If we get good accuracy (≤10m) and it's not the first attempt, use it
+        if (location.accuracy <= 10 && i > 0) {
+          console.log('✅ Good accuracy achieved:', location.accuracy.toFixed(1) + 'm');
+          return location;
+        }
+        
+        // Wait between attempts for GPS to stabilize
+        if (i < attempts - 1) {
+          console.log('Waiting 3 seconds for GPS to stabilize...');
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+      } catch (error) {
+        logError(error instanceof Error ? error : new Error(String(error)), `LOCATION_ATTEMPT_${i + 1}`);
+        console.warn(`❌ Location attempt ${i + 1} failed:`, error);
+        if (i === attempts - 1 && locations.length === 0) {
+          throw error;
+        }
       }
     }
-  }
-  
-  if (locations.length === 0) {
-    throw new Error('Failed to get any location readings');
-  }
-  
-  // Return the most accurate location
-  const bestLocation = locations.reduce((best, current) => 
-    current.accuracy < best.accuracy ? current : best
-  );
-  
-  console.log('=== FINAL LOCATION SELECTED ===');
-  console.log('Best location from', locations.length, 'attempts:');
-  console.log(`  Coordinates: ${bestLocation.latitude.toFixed(8)}, ${bestLocation.longitude.toFixed(8)}`);
-  console.log(`  Accuracy: ${bestLocation.accuracy.toFixed(1)}m`);
-  console.log('=== END LOCATION SELECTION ===');
-  
-  return bestLocation;
+    
+    if (locations.length === 0) {
+      const error = new Error('Failed to get any location readings after all attempts');
+      logError(error, 'LOCATION_COMPLETE_FAILURE');
+      throw error;
+    }
+    
+    // Return the most accurate location
+    const bestLocation = locations.reduce((best, current) => 
+      current.accuracy < best.accuracy ? current : best
+    );
+    
+    console.log('=== FINAL LOCATION SELECTED ===');
+    console.log('Best location from', locations.length, 'attempts:');
+    console.log(`  Coordinates: ${bestLocation.latitude.toFixed(8)}, ${bestLocation.longitude.toFixed(8)}`);
+    console.log(`  Accuracy: ${bestLocation.accuracy.toFixed(1)}m`);
+    console.log('=== END LOCATION SELECTION ===');
+    
+    return bestLocation;
+  }, 2, 2000, 'GET_ACCURATE_LOCATION');
 };
 
 /**

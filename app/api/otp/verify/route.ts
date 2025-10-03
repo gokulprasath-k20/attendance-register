@@ -5,10 +5,13 @@ import { createSupabaseAdmin } from '@/lib/supabase/client';
 import { calculateDistance } from '@/lib/utils/geolocation';
 import { isOTPExpired } from '@/lib/utils/otp';
 import { ATTENDANCE_CONFIG } from '@/config/app.config';
+import { logError, handleApiError } from '@/lib/utils/error-handler';
 
 export async function POST(request: NextRequest) {
+  let session: any = null;
+  
   try {
-    const session = await getServerSession(authOptions);
+    session = await getServerSession(authOptions);
 
     if (!session || session.user.role !== 'student') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -156,9 +159,10 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Verify OTP error:', error);
+    logError(error instanceof Error ? error : new Error(String(error)), 'VERIFY_OTP_API', session?.user?.id);
+    const errorMessage = handleApiError(error, 'VERIFY_OTP');
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

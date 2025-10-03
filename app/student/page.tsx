@@ -10,6 +10,7 @@ import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
 import { getCurrentLocation, getAccurateLocation, isDistanceReasonable } from '@/lib/utils/geolocation';
 import { formatDistance } from '@/lib/utils/geolocation';
+import { handleNetworkError, logError } from '@/lib/utils/error-handler';
 import { getSubjectsForYearAndSemester, getActualSemesterNumber } from '@/lib/utils/subjects';
 
 export default function StudentDashboard() {
@@ -145,7 +146,8 @@ export default function StudentDashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        showToast(data.error || 'Failed to mark attendance', 'error');
+        const errorMessage = handleNetworkError({ status: response.status, message: data.error }, 'MARK_ATTENDANCE');
+        showToast(errorMessage, 'error');
       } else {
         const distanceText = formatDistance(data.attendance.distance);
         const statusText = data.attendance.status === 'P' ? 'Present' : 'Absent';
@@ -166,7 +168,9 @@ export default function StudentDashboard() {
         refetch();
       }
     } catch (error) {
-      showToast(error instanceof Error ? error.message : 'An error occurred', 'error');
+      logError(error instanceof Error ? error : new Error(String(error)), 'STUDENT_MARK_ATTENDANCE');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred while marking attendance';
+      showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
