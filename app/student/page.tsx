@@ -155,9 +155,9 @@ export default function StudentDashboard() {
             'success'
           );
         } else {
-          const actualDistance = data.attendance.distance.toFixed(1);
+          const exactDistance = data.attendance.distance.toFixed(3);
           showToast(
-            `❌ Attendance marked: ${statusText} - Distance: ${actualDistance}m (Must be ≤ 10.0m)`,
+            `❌ Attendance marked: ${statusText} - Exact Distance: ${exactDistance}m (Required: ≤ 10.000m)`,
             'error'
           );
         }
@@ -263,15 +263,18 @@ export default function StudentDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Mark Attendance
             </h2>
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm text-green-800">
-                <strong>📍 STRICT 10-Meter Rule:</strong> You must be exactly 10.0 meters or closer to your staff's location to be marked present.
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>📏 EXACT DISTANCE CALCULATION:</strong> Final Year Project - Precise GPS Distance Measurement
               </p>
-              <p className="text-xs text-green-600 mt-1">
-                ⚠️ <strong>Important:</strong> 10.1m or 11m = ABSENT. Distance must be ≤ 10.0m for attendance.
+              <p className="text-xs text-blue-700 mt-1">
+                🎯 <strong>Millimeter Precision:</strong> Distance calculated using Haversine formula with WGS84 ellipsoid
               </p>
-              <p className="text-xs text-green-600 mt-1">
-                ⚡ Optimized for quick attendance marking - location will be obtained instantly.
+              <p className="text-xs text-blue-700 mt-1">
+                📐 <strong>10-Meter Rule:</strong> Exactly ≤ 10.000m required (e.g., 10.001m = ABSENT)
+              </p>
+              <p className="text-xs text-blue-700 mt-1">
+                ⚡ Shows exact calculated distance - no GPS compensation applied
               </p>
             </div>
             

@@ -133,32 +133,23 @@ export async function POST(request: NextRequest) {
     console.log('  Within range:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
     console.log('=== END ENHANCED DEBUG ===');
 
-    // Enhanced status determination for nearby devices with GPS accuracy consideration
-    const roundedDistance = Math.round(distance * 10) / 10;
+    // EXACT DISTANCE VALIDATION FOR FINAL YEAR PROJECT
+    // No GPS compensation - use exact calculated distance
+    const preciseDistance = Math.round(distance * 1000) / 1000; // Millimeter precision
     
-    // Special handling for very close coordinates with GPS accuracy issues
-    let status = roundedDistance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
+    // Strict 10-meter rule - exactly as calculated
+    const status = preciseDistance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
       ? ATTENDANCE_CONFIG.STATUS.PRESENT
       : ATTENDANCE_CONFIG.STATUS.ABSENT;
     
-    // GPS accuracy compensation for nearby devices
-    if (status === ATTENDANCE_CONFIG.STATUS.ABSENT && accuracy && accuracy > 15) {
-      // If GPS accuracy is poor (>15m) but calculated distance is close to threshold
-      if (roundedDistance <= 15 && roundedDistance > 10) {
-        console.log('🎯 GPS ACCURACY COMPENSATION APPLIED');
-        console.log(`   Poor GPS accuracy (${accuracy}m) with distance ${roundedDistance}m`);
-        console.log('   Distance close to threshold - considering as PRESENT for nearby devices');
-        status = ATTENDANCE_CONFIG.STATUS.PRESENT;
-      }
-    }
-    
-    console.log('Enhanced Distance Validation:');
-    console.log('  Raw distance:', distance.toFixed(6), 'meters');
-    console.log('  Rounded distance:', roundedDistance, 'meters');
-    console.log('  GPS accuracy:', accuracy ? `${accuracy}m` : 'unknown');
-    console.log('  Max allowed:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('EXACT DISTANCE VALIDATION (Final Year Project):');
+    console.log('  Raw calculated distance:', distance.toFixed(10), 'meters');
+    console.log('  Precise distance (3 decimals):', preciseDistance, 'meters');
+    console.log('  GPS accuracy reported:', accuracy ? `${accuracy}m` : 'unknown');
+    console.log('  Maximum allowed distance:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
     console.log('  Final status:', status === 'P' ? 'PRESENT' : 'ABSENT');
-    console.log('  Rule: Distance ≤ 10.0m OR (≤ 15m with poor GPS accuracy)');
+    console.log('  Validation rule: EXACT distance ≤ 10.000m = PRESENT');
+    console.log('  No GPS compensation applied - showing true calculated distance');
 
     // Mark attendance
     const { data: attendance, error: attendanceError } = await supabase
