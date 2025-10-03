@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
+import AuthNavbar from '@/components/auth-navbar';
 
 export default function StaffSignUp() {
   const [formData, setFormData] = useState({
@@ -79,23 +79,16 @@ export default function StaffSignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <AuthNavbar />
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
-      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/logo (1).png"
-              alt="Attendance Management System Logo"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
+      <div className="flex items-center justify-center px-4 py-8">
+        <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">Staff Registration</h2>
+            <p className="text-gray-600 mt-2">Create a staff account</p>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Staff Registration</h2>
-          <p className="text-gray-600 mt-2">Create a staff account</p>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -189,33 +182,31 @@ export default function StaffSignUp() {
           </button>
         </form>
 
-        <div className="mt-6 text-center space-y-2">
-          <p className="text-gray-600">
-            Already have an account?{' '}
-            <Link href="/auth/staff/signin" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
-              Sign In
-            </Link>
-          </p>
-          <Link href="/" className="block text-sm text-gray-500 hover:text-gray-700">
-            ← Back to Home
-          </Link>
-        </div>
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <Link href="/auth/staff/signin" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
+                Sign In
+              </Link>
+            </p>
+          </div>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-center text-sm text-gray-500">Register as:</p>
-          <div className="flex gap-2 mt-3 justify-center">
-            <Link
-              href="/auth/admin/signup"
-              className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Admin
-            </Link>
-            <Link
-              href="/auth/student/signup"
-              className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Student
-            </Link>
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-center text-sm text-gray-500">Register as:</p>
+            <div className="flex gap-2 mt-3 justify-center">
+              <Link
+                href="/auth/admin/signup"
+                className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Admin
+              </Link>
+              <Link
+                href="/auth/student/signup"
+                className="text-sm px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Student
+              </Link>
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import Image from 'next/image';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
@@ -112,23 +111,12 @@ export default function AdminDashboard() {
       <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="mb-6">
-            <div className="flex items-center justify-center mb-4">
-              <Image
-                src="/logo (1).png"
-                alt="Attendance Management System Logo"
-                width={60}
-                height={60}
-                className="object-contain mr-4"
-              />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Admin Dashboard
-                </h1>
-                <p className="text-gray-600">
-                  View and manage attendance records. Staff and students register independently.
-                </p>
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-600">
+              View and manage attendance records. Staff and students register independently.
+            </p>
           </div>
 
           {/* Attendance Records */}

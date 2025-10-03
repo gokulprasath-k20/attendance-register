@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
+import AuthNavbar from '@/components/auth-navbar';
 
 export default function StudentSignIn() {
   const [email, setEmail] = useState('');
@@ -78,23 +78,16 @@ export default function StudentSignIn() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50">
+      <AuthNavbar />
       {toast && <Toast message={toast.message} type={toast.type} onClose={closeToast} />}
       
-      <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-6">
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/logo (1).png"
-              alt="Attendance Management System Logo"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
+      <div className="flex items-center justify-center px-4 py-12">
+        <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-gray-900">Student Sign In</h2>
+            <p className="text-gray-600 mt-2">Access your student dashboard</p>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Student Sign In</h2>
-          <p className="text-gray-600 mt-2">Access your student dashboard</p>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -143,18 +136,15 @@ export default function StudentSignIn() {
           </button>
         </form>
 
-        <div className="mt-4 text-center space-y-2">
-          <p className="text-gray-600">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/student/signup" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
-              Register
-            </Link>
-          </p>
-          <Link href="/" className="block text-sm text-gray-500 hover:text-gray-700">
-            ← Back to Home
-          </Link>
+          <div className="mt-4 text-center">
+            <p className="text-gray-600">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/student/signup" className="text-[#8B44F7] hover:text-[#7c3aed] font-medium">
+                Register
+              </Link>
+            </p>
+          </div>
         </div>
-
       </div>
     </div>
   );
