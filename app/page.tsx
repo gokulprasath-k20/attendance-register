@@ -6,7 +6,6 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
-import DepartmentHeader from '@/components/department-header';
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -49,7 +48,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <DepartmentHeader />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
           <div className="mb-6">
