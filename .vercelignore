@@ -1,0 +1,9 @@
+# Vercel ignore file
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+build-output.txt
+build.log
+debug-user-role.html

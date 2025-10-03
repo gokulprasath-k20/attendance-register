@@ -3,7 +3,7 @@
  * Functions for handling geolocation and distance calculations
  */
 
-import { logError, handleLocationError, retryOperation } from './error-handler';
+import { logError, handleLocationError } from './error-handler';
 
 export interface Coordinates {
   latitude: number;
