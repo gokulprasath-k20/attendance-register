@@ -98,13 +98,13 @@ export const QUERY_CONFIG = {
 // Navigation menu configuration
 export const NAVIGATION_MENU = {
   admin: [
-    { name: 'Attendance Records', href: ROUTES.ADMIN_DASHBOARD },
+    // Dashboard button removed
   ],
   staff: [
-    { name: 'Dashboard', href: ROUTES.STAFF_DASHBOARD },
+    // Dashboard button removed
   ],
   student: [
-    { name: 'Dashboard', href: ROUTES.STUDENT_DASHBOARD },
+    // Dashboard button removed
   ],
 } as const;
 

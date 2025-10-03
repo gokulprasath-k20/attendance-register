@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { signOut } from 'next-auth/react';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
@@ -210,6 +211,10 @@ export default function StaffDashboard() {
     }));
 
     exportToPDF(records, 'Staff Attendance Report');
+  };
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/auth/staff/signin' });
   };
 
   return (
@@ -590,6 +595,16 @@ export default function StaffDashboard() {
                 </table>
               </div>
             )}
+          </div>
+          
+          {/* Sign Out Button at Bottom */}
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={handleSignOut}
+              className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
       </div>

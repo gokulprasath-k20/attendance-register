@@ -39,21 +39,7 @@ export default function Navbar() {
         <div className="relative flex items-center justify-between h-20">
           {/* Left side - Navigation Menu */}
           <div className="flex items-center space-x-1 sm:space-x-4">
-            {menuItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-gray-700 hover:bg-purple-50 hover:text-[#9B7EBD] px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
-              >
-                <span className="hidden sm:inline">{item.name}</span>
-                <span className="sm:hidden">
-                  {item.name.includes('Dashboard') ? 'Home' : 
-                   item.name.includes('User') ? 'Users' :
-                   item.name.includes('Attendance') ? 'Records' :
-                   item.name.split(' ')[0]}
-                </span>
-              </Link>
-            ))}
+            {/* Navigation menu items removed */}
           </div>
 
           {/* Center - Logo */}
@@ -68,22 +54,12 @@ export default function Navbar() {
             />
           </div>
 
-          {/* Right side - User Info & Sign Out */}
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="flex items-center space-x-1 sm:space-x-2 text-gray-700">
-              <span className="text-xs sm:text-sm font-medium truncate max-w-20 sm:max-w-none">{session.user.name}</span>
-              <span className="text-xs bg-[#9B7EBD] text-white px-2 sm:px-3 py-1 rounded-full">
-                {session.user.role}
-              </span>
-            </div>
-
-            <button
-              onClick={handleSignOut}
-              className="bg-red-500 hover:bg-red-600 text-white px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors shadow-sm"
-            >
-              <span className="hidden sm:inline">Sign Out</span>
-              <span className="sm:hidden">Out</span>
-            </button>
+          {/* Right side - User Info Only */}
+          <div className="flex items-center space-x-1 sm:space-x-2 text-gray-700">
+            <span className="text-xs sm:text-sm font-medium truncate max-w-20 sm:max-w-none">{session.user.name}</span>
+            <span className="text-xs bg-[#9B7EBD] text-white px-2 sm:px-3 py-1 rounded-full">
+              {session.user.role}
+            </span>
           </div>
         </div>
       </div>
