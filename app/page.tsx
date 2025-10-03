@@ -52,10 +52,10 @@ export default function Home() {
         <div className="text-center">
           <div className="mb-6">
             <Image
-              src="https://avsec-it.vercel.app/logo.png"
-              alt="College Logo"
-              width={200}
-              height={60}
+              src="/college-logo.png"
+              alt="AVS Engineering College Logo"
+              width={800}
+              height={200}
               className="h-16 w-auto mx-auto mb-4"
               priority
             />
