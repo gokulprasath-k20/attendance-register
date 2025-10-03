@@ -1,0 +1,6 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" fill="#9B7EBD"/>
+  <text x="50" y="35" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">COLLEGE</text>
+  <text x="50" y="55" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">ATTENDANCE</text>
+  <text x="50" y="75" font-family="Arial, sans-serif" font-size="10" fill="white" text-anchor="middle">SYSTEM</text>
+</svg>

@@ -79,6 +79,7 @@ export default function AdminDashboard() {
     const records = attendanceData.attendance.map((record: any) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
+      year: record.otp_sessions?.year || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),
@@ -89,12 +90,13 @@ export default function AdminDashboard() {
     exportToExcel(records);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (!attendanceData?.attendance) return;
 
     const records = attendanceData.attendance.map((record: any) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
+      year: record.otp_sessions?.year || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),
@@ -102,7 +104,7 @@ export default function AdminDashboard() {
       distance: record.distance_meters,
     }));
 
-    exportToPDF(records, 'Admin Attendance Report');
+    await exportToPDF(records, 'Admin Attendance Report');
   };
 
   const handleSignOut = () => {

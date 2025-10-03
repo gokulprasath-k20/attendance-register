@@ -199,6 +199,7 @@ export default function StaffDashboard() {
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
+      year: record.otp_sessions?.year || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),
       status: record.status === 'P' ? 'Present' : 'Absent',
@@ -208,20 +209,21 @@ export default function StaffDashboard() {
     exportToExcel(records);
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (filteredAttendanceRecords.length === 0) return;
 
     const records = filteredAttendanceRecords.map((record: AttendanceRecord) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
       subject: record.otp_sessions?.subject || 'N/A',
+      year: record.otp_sessions?.year || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),
       status: record.status === 'P' ? 'Present' : 'Absent',
       distance: record.distance_meters,
     }));
 
-    exportToPDF(records, 'Staff Attendance Report');
+    await exportToPDF(records, 'Staff Attendance Report');
   };
 
   const handleSignOut = () => {
@@ -556,6 +558,9 @@ export default function StaffDashboard() {
                         Subject
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                        Year
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                         Date
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
@@ -588,6 +593,9 @@ export default function StaffDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {record.otp_sessions?.subject}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          Year {record.otp_sessions?.year}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.created_at).toLocaleDateString()}
