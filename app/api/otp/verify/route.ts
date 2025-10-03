@@ -111,8 +111,8 @@ export async function POST(request: NextRequest) {
     );
     
     console.log('Calculated distance:', distance, 'meters');
-    console.log('Max allowed distance:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
-    console.log('Distance in km:', (distance / 1000).toFixed(2), 'km');
+    console.log('Max allowed distance (10m rule):', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('Within 10m radius:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
     console.log('=== END DEBUG ===');
 
     // Determine status

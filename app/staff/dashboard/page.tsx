@@ -8,7 +8,7 @@ import UserInfo from '@/components/user-info';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
-import { getCurrentLocation } from '@/lib/utils/geolocation';
+import { getCurrentLocation, getAccurateLocation } from '@/lib/utils/geolocation';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
 import { exportToExcel, exportToPDF, formatDateForExport, formatTimeForExport } from '@/lib/utils/export';
 import { getSubjectsForYearAndSemester, getSemesterLabel } from '@/lib/utils/subjects';
@@ -167,7 +167,14 @@ export default function StaffDashboard() {
     e.preventDefault();
 
     try {
-      const location = await getCurrentLocation();
+      showToast('Getting your precise location for 10-meter rule OTP...', 'success');
+      const location = await getAccurateLocation(5);
+      
+      console.log('✅ Staff location for OTP (high-precision):', {
+        coordinates: `${location.latitude.toFixed(8)}, ${location.longitude.toFixed(8)}`,
+        accuracy: `${location.accuracy.toFixed(1)}m`,
+        timestamp: new Date().toISOString()
+      });
       
       generateOTPMutation.mutate({
         latitude: location.latitude,
@@ -235,6 +242,11 @@ export default function StaffDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Generate Attendance OTP
             </h2>
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>📍 10-Meter Rule:</strong> Students must be within 10 meters of your location to be marked present. Those beyond this range will be marked absent with "Too far" displayed.
+              </p>
+            </div>
             {staffSubjects.length > 0 && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">

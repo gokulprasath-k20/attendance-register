@@ -38,7 +38,7 @@ export const PROTECTED_ROUTES = {
 // Attendance configuration
 export const ATTENDANCE_CONFIG = {
   MAX_DISTANCE_METERS: parseInt(
-    process.env.NEXT_PUBLIC_MAX_ATTENDANCE_DISTANCE || '100',
+    process.env.NEXT_PUBLIC_MAX_ATTENDANCE_DISTANCE || '10',
     10
   ),
   OTP_EXPIRY_MINUTES: parseInt(

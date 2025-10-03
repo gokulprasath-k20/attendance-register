@@ -8,7 +8,7 @@ import UserInfo from '@/components/user-info';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { AttendanceTableSkeleton } from '@/components/skeleton-loader';
-import { getCurrentLocation } from '@/lib/utils/geolocation';
+import { getCurrentLocation, getAccurateLocation, isDistanceReasonable } from '@/lib/utils/geolocation';
 import { formatDistance } from '@/lib/utils/geolocation';
 import { getSubjectsForYearAndSemester, getActualSemesterNumber } from '@/lib/utils/subjects';
 
@@ -112,8 +112,22 @@ export default function StudentDashboard() {
     setLoading(true);
 
     try {
-      // Get current location
-      const location = await getCurrentLocation();
+      // Get accurate location with multiple attempts for maximum precision
+      showToast('Getting your precise location for 10-meter rule...', 'success');
+      const location = await getAccurateLocation(5);
+      
+      // Validate location accuracy - stricter for 10m rule
+      if (!isDistanceReasonable(0, location.accuracy)) {
+        showToast(`GPS accuracy insufficient (${location.accuracy.toFixed(1)}m). For the 10-meter rule, we need ≤20m accuracy. Please move outside or near a window and try again.`, 'error');
+        return;
+      }
+      
+      console.log('✅ Using high-precision location:', {
+        coordinates: `${location.latitude.toFixed(8)}, ${location.longitude.toFixed(8)}`,
+        accuracy: `${location.accuracy.toFixed(1)}m`
+      });
+
+      console.log('Using location:', location);
 
       // Submit OTP with selected subject
       const response = await fetch('/api/otp/verify', {
@@ -124,6 +138,7 @@ export default function StudentDashboard() {
           latitude: location.latitude,
           longitude: location.longitude,
           selectedSubject,
+          accuracy: location.accuracy,
         }),
       });
 
@@ -132,10 +147,21 @@ export default function StudentDashboard() {
       if (!response.ok) {
         showToast(data.error || 'Failed to mark attendance', 'error');
       } else {
-        showToast(
-          `Attendance marked: ${data.attendance.status} (Distance: ${formatDistance(data.attendance.distance)})`,
-          data.attendance.status === 'P' ? 'success' : 'error'
-        );
+        const distanceText = formatDistance(data.attendance.distance);
+        const statusText = data.attendance.status === 'P' ? 'Present' : 'Absent';
+        
+        if (data.attendance.status === 'P') {
+          showToast(
+            `✅ Attendance marked: ${statusText} (Distance: ${distanceText})`,
+            'success'
+          );
+        } else {
+          showToast(
+            `❌ Attendance marked: ${statusText} - You are too far from the staff location`,
+            'error'
+          );
+        }
+        
         setOtpCode('');
         refetch();
       }
@@ -235,6 +261,11 @@ export default function StudentDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Mark Attendance
             </h2>
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800">
+                <strong>📍 10-Meter Rule:</strong> You must be within 10 meters of your staff's location to be marked present. Make sure you're close to your teacher before submitting the OTP.
+              </p>
+            </div>
             {studentInfo && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
