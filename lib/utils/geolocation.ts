@@ -193,7 +193,6 @@ export const isDistanceReasonable = (distance: number, accuracy: number): boolea
  * @returns Promise with best location result
  */
 export const getAccurateLocation = async (attempts: number = 5): Promise<LocationResult> => {
-  return retryOperation(async () => {
     const locations: LocationResult[] = [];
     
     console.log(`=== GETTING HIGH-PRECISION LOCATION (${attempts} attempts) ===`);
@@ -291,7 +290,6 @@ export const getQuickLocation = async (): Promise<LocationResult> => {
     
     console.log('✅ Final quick location:', bestLocation.accuracy.toFixed(1) + 'm');
     return bestLocation;
-    
   } catch (error) {
     logError(error instanceof Error ? error : new Error(String(error)), 'QUICK_LOCATION');
     throw error;
@@ -300,7 +298,6 @@ export const getQuickLocation = async (): Promise<LocationResult> => {
 
 /**
  * Test distance calculation with known coordinates for validation
- * @returns Test results
  */
 export const testDistanceCalculation = () => {
   console.log('=== DISTANCE CALCULATION ACCURACY TEST ===');
