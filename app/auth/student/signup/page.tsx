@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 import { ACADEMIC_CONFIG } from '@/config/app.config';
@@ -82,17 +81,6 @@ export default function StudentSignUp() {
       
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
         <div className="text-center mb-8">
-          <div className="mb-6">
-            <Image
-              src="https://avsec-it.vercel.app/logo.png"
-              alt="AVS Engineering College"
-              width={200}
-              height={60}
-              className="h-16 w-auto mx-auto mb-4"
-              priority
-            />
-            <h3 className="text-lg font-semibold text-gray-800">Department of Information Technology</h3>
-          </div>
           <div className="text-4xl mb-4">🎓</div>
           <h2 className="text-3xl font-bold text-gray-900">Student Registration</h2>
           <p className="text-gray-600 mt-2">Create your student account</p>

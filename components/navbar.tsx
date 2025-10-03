@@ -2,7 +2,6 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { NAVIGATION_MENU, ROUTES } from '@/config/app.config';
 
 export default function Navbar() {
@@ -56,37 +55,16 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Center - Logo */}
+          {/* Center - App Title */}
           <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2 hidden md:flex">
-            {/* College Logo */}
-            <div className="flex items-center space-x-3 mb-2">
-              <Image
-                src="https://avsec-it.vercel.app/logo.png"
-                alt="AVS Engineering College"
-                width={200}
-                height={60}
-                className="h-10 sm:h-12 w-auto"
-                priority
-              />
-            </div>
-            
-            {/* Department Name */}
             <div className="text-center">
-              <h1 className="text-base sm:text-lg font-semibold text-gray-800 tracking-wide">Department of Information Technology</h1>
-              <p className="text-xs text-gray-500 mt-1 hidden sm:block">Attendance Management System</p>
+              <h1 className="text-base sm:text-lg font-semibold text-gray-800 tracking-wide">Attendance Management System</h1>
             </div>
           </div>
 
-          {/* Mobile Logo - Simplified */}
+          {/* Mobile App Title - Simplified */}
           <div className="flex items-center md:hidden absolute left-1/2 transform -translate-x-1/2">
-            <Image
-              src="https://avsec-it.vercel.app/logo.png"
-              alt="AVS Engineering College"
-              width={120}
-              height={36}
-              className="h-8 w-auto"
-              priority
-            />
+            <h1 className="text-sm font-semibold text-gray-800">AMS</h1>
           </div>
 
           {/* Right side - User Info & Sign Out */}
