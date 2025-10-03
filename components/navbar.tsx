@@ -2,6 +2,7 @@
 
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { NAVIGATION_MENU, ROUTES } from '@/config/app.config';
 
 export default function Navbar() {
@@ -55,16 +56,16 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Center - App Title */}
-          <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2 hidden md:flex">
-            <div className="text-center">
-              <h1 className="text-xs sm:text-sm font-medium text-gray-800 tracking-wide">Attendance Management System</h1>
-            </div>
-          </div>
-
-          {/* Mobile App Title - Simplified */}
-          <div className="flex items-center md:hidden absolute left-1/2 transform -translate-x-1/2">
-            <h1 className="text-sm font-semibold text-gray-800">AMS</h1>
+          {/* Center - Logo */}
+          <div className="flex items-center absolute left-1/2 transform -translate-x-1/2">
+            <Image
+              src="/logo (1).png"
+              alt="Logo"
+              width={800}
+              height={200}
+              className="h-12 w-auto"
+              priority
+            />
           </div>
 
           {/* Right side - User Info & Sign Out */}
