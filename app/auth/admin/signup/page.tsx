@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 
@@ -66,7 +67,15 @@ export default function AdminSignUp() {
       
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-10">
         <div className="text-center mb-8">
-          <div className="text-4xl mb-4">👨‍💼</div>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo (1).png"
+              alt="Attendance Management System Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </div>
           <h2 className="text-3xl font-bold text-gray-900">Admin Registration</h2>
           <p className="text-gray-600 mt-2">Create an admin account</p>
         </div>

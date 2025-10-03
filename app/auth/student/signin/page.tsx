@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
 
@@ -82,7 +83,15 @@ export default function StudentSignIn() {
       
       <div className="max-w-lg w-full bg-white rounded-2xl shadow-2xl p-6">
         <div className="text-center mb-6">
-          <div className="text-3xl mb-3">🎓</div>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/logo (1).png"
+              alt="Attendance Management System Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
+          </div>
           <h2 className="text-3xl font-bold text-gray-900">Student Sign In</h2>
           <p className="text-gray-600 mt-2">Access your student dashboard</p>
         </div>

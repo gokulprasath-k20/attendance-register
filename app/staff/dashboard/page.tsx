@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import Image from 'next/image';
 import Navbar from '@/components/navbar';
 import LoadingSpinner from '@/components/loading-spinner';
 import Toast, { useToast } from '@/components/toast';
@@ -219,9 +220,18 @@ export default function StaffDashboard() {
       
       <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            Staff Dashboard
-          </h1>
+          <div className="flex items-center justify-center mb-6">
+            <Image
+              src="/logo (1).png"
+              alt="Attendance Management System Logo"
+              width={60}
+              height={60}
+              className="object-contain mr-4"
+            />
+            <h1 className="text-3xl font-bold text-gray-900">
+              Staff Dashboard
+            </h1>
+          </div>
 
           {/* Generate OTP Section */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
