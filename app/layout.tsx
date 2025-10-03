@@ -7,8 +7,7 @@ import { PerformanceMonitor } from '@/components/performance-monitor';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Attendance Management System',
-  description: 'Geolocation-based attendance tracking with OTP verification',
+  title: 'Attendance Management System'
 };
 
 export default function RootLayout({
