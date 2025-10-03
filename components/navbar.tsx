@@ -4,6 +4,7 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NAVIGATION_MENU, ROUTES } from '@/config/app.config';
+import DepartmentHeader from './department-header';
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -34,33 +35,23 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-gray-50 to-white shadow-lg border-b border-gray-200">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-20">
-          {/* Left side - Navigation Menu */}
-          <div className="flex items-center space-x-1 sm:space-x-4">
-            {/* Navigation menu items removed */}
-          </div>
-
-          {/* Center - Logo */}
-          <div className="flex items-center absolute left-1/2 transform -translate-x-1/2">
+    <>
+      <nav className="bg-gradient-to-r from-gray-50 to-white shadow-lg border-b border-gray-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-20">
+            {/* Center - Logo */}
             <Image
               src="/logo (1).png"
               alt="Logo"
-              width={950}
+              width={800}
               height={200}
               className="h-12 w-auto"
               priority
             />
           </div>
-
-          {/* Right side - User Info Only */}
-          <div className="flex flex-col items-end text-gray-700">
-            <span className="text-sm font-medium">{session.user.name}</span>
-            <span className="text-xs text-gray-600 capitalize">{session.user.role}</span>
-          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      <DepartmentHeader />
+    </>
   );
 }
