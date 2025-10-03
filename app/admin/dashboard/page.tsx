@@ -121,9 +121,6 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Admin Dashboard
             </h1>
-            <p className="text-gray-600">
-              View and manage attendance records. Staff and students register independently.
-            </p>
           </div>
 
           {/* Attendance Records */}
@@ -132,16 +129,16 @@ export default function AdminDashboard() {
               <h2 className="text-xl font-semibold text-gray-900">
                 All Attendance Records
               </h2>
-              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+              <div className="flex flex-col sm:flex-row gap-1 sm:space-x-1">
                 <button
                   onClick={handleExportExcel}
-                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm"
+                  className="bg-[#9B7EBD] hover:bg-[#8B6EAD] text-white px-3 py-1.5 rounded-md font-medium transition-colors shadow-md hover:shadow-lg text-xs"
                 >
                   Export Excel
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl text-sm"
+                  className="bg-[#7C5C9E] hover:bg-[#6C4C8E] text-white px-3 py-1.5 rounded-md font-medium transition-colors shadow-md hover:shadow-lg text-xs"
                 >
                   Export PDF
                 </button>
@@ -369,11 +366,11 @@ export default function AdminDashboard() {
             )}
           </div>
           
-          {/* Sign Out Button at Bottom */}
-          <div className="mt-8 flex justify-center">
+          {/* Sign Out Button at Bottom Right */}
+          <div className="mt-8 flex justify-end">
             <button
               onClick={handleSignOut}
-              className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium transition-colors shadow-md hover:shadow-lg text-sm"
             >
               Sign Out
             </button>

@@ -599,11 +599,11 @@ export default function StaffDashboard() {
             )}
           </div>
           
-          {/* Sign Out Button at Bottom */}
-          <div className="mt-8 flex justify-center">
+          {/* Sign Out Button at Bottom Right */}
+          <div className="mt-8 flex justify-end">
             <button
               onClick={handleSignOut}
-              className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-lg font-medium transition-colors shadow-lg hover:shadow-xl"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium transition-colors shadow-md hover:shadow-lg text-sm"
             >
               Sign Out
             </button>
