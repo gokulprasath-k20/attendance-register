@@ -113,22 +113,19 @@ export default function StudentDashboard() {
     setLoading(true);
 
     try {
-      // Get accurate location with multiple attempts for maximum precision
-      showToast('Getting your precise location for 10-meter rule...', 'success');
-      const location = await getAccurateLocation(5);
+      // Use single location attempt for faster response
+      showToast('Getting your location...', 'success');
+      const location = await getCurrentLocation(); // Single attempt for speed
       
-      // Validate location accuracy - stricter for 10m rule
-      if (!isDistanceReasonable(0, location.accuracy)) {
-        showToast(`GPS accuracy insufficient (${location.accuracy.toFixed(1)}m). For the 10-meter rule, we need ≤20m accuracy. Please move outside or near a window and try again.`, 'error');
-        return;
+      // More lenient accuracy check for better UX
+      if (location.accuracy > 100) { // Very lenient for speed
+        showToast(`GPS accuracy is ${location.accuracy.toFixed(0)}m. Distance may be less accurate.`, 'success');
       }
       
-      console.log('✅ Using high-precision location:', {
+      console.log('✅ Using location:', {
         coordinates: `${location.latitude.toFixed(8)}, ${location.longitude.toFixed(8)}`,
         accuracy: `${location.accuracy.toFixed(1)}m`
       });
-
-      console.log('Using location:', location);
 
       // Submit OTP with selected subject
       const response = await fetch('/api/otp/verify', {
@@ -268,6 +265,9 @@ export default function StudentDashboard() {
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-sm text-green-800">
                 <strong>📍 10-Meter Rule:</strong> You must be within 10 meters of your staff's location to be marked present. Make sure you're close to your teacher before submitting the OTP.
+              </p>
+              <p className="text-xs text-green-600 mt-1">
+                ⚡ Optimized for quick attendance marking - location will be obtained instantly.
               </p>
             </div>
             {studentInfo && (

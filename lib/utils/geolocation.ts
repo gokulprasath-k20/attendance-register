@@ -222,10 +222,11 @@ export const getAccurateLocation = async (attempts: number = 5): Promise<Locatio
           return location;
         }
         
-        // Wait between attempts for GPS to stabilize
+        // Wait between attempts for GPS to stabilize (reduced wait time)
         if (i < attempts - 1) {
-          console.log('Waiting 3 seconds for GPS to stabilize...');
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          const waitTime = attempts <= 2 ? 1500 : 3000; // Shorter wait for quick mode
+          console.log(`Waiting ${waitTime/1000} seconds for GPS to stabilize...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
         }
       } catch (error) {
         logError(error instanceof Error ? error : new Error(String(error)), `LOCATION_ATTEMPT_${i + 1}`);
@@ -254,7 +255,47 @@ export const getAccurateLocation = async (attempts: number = 5): Promise<Locatio
     console.log('=== END LOCATION SELECTION ===');
     
     return bestLocation;
-  }, 2, 2000, 'GET_ACCURATE_LOCATION');
+};
+
+/**
+ * Get location quickly for student OTP verification (optimized for speed)
+ * @returns Promise with location result
+ */
+export const getQuickLocation = async (): Promise<LocationResult> => {
+  console.log('=== GETTING QUICK LOCATION FOR OTP ===');
+  
+  try {
+    // Try to get location immediately first
+    const location = await getCurrentLocation();
+    
+    console.log('Quick location result:', {
+      lat: location.latitude.toFixed(8),
+      lng: location.longitude.toFixed(8),
+      accuracy: location.accuracy.toFixed(1) + 'm'
+    });
+    
+    // Accept any reasonable accuracy for speed
+    if (location.accuracy <= 100) {
+      console.log('✅ Quick location accepted:', location.accuracy.toFixed(1) + 'm');
+      return location;
+    }
+    
+    // If accuracy is poor, try one more time with a short wait
+    console.log('Poor accuracy, trying once more...');
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const secondLocation = await getCurrentLocation();
+    
+    // Return the better of the two
+    const bestLocation = secondLocation.accuracy < location.accuracy ? secondLocation : location;
+    
+    console.log('✅ Final quick location:', bestLocation.accuracy.toFixed(1) + 'm');
+    return bestLocation;
+    
+  } catch (error) {
+    logError(error instanceof Error ? error : new Error(String(error)), 'QUICK_LOCATION');
+    throw error;
+  }
 };
 
 /**
