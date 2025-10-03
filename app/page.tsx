@@ -52,7 +52,7 @@ export default function Home() {
         <div className="text-center">
           <div className="mb-6">
             <Image
-              src="/college-logo.png"
+              src="/logo (1).png"
               alt="AVS Engineering College Logo"
               width={800}
               height={200}
