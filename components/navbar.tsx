@@ -55,11 +55,9 @@ export default function Navbar() {
           </div>
 
           {/* Right side - User Info Only */}
-          <div className="flex items-center space-x-1 sm:space-x-2 text-gray-700">
-            <span className="text-xs sm:text-sm font-medium truncate max-w-20 sm:max-w-none">{session.user.name}</span>
-            <span className="text-xs bg-[#9B7EBD] text-white px-2 sm:px-3 py-1 rounded-full">
-              {session.user.role}
-            </span>
+          <div className="flex flex-col items-end text-gray-700">
+            <span className="text-sm font-medium">{session.user.name}</span>
+            <span className="text-xs text-gray-600 capitalize">{session.user.role}</span>
           </div>
         </div>
       </div>
