@@ -1,20 +1,43 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
+    /* IT Panel Theme Colors - Exact Match */
+    --color-primary: #3B82F6;
+    --color-primary-dark: #2563EB;
+    --color-primary-light: #60A5FA;
+    --color-background: #ffffff;
+    --color-background-secondary: #f8fafc;
+    --color-border: #e2e8f0;
+    --color-border-light: #f1f5f9;
+    --color-text: #1e293b;
+    --color-text-secondary: #64748b;
+    --color-text-muted: #94a3b8;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    
+    /* Keep original lavender colors as fallback */
     --lavender-50: #f5f3ff;
     --lavender-100: #ede9fe;
     --lavender-200: #ddd6fe;
     --lavender-300: #c4b5fd;
     --lavender-400: #a78bfa;
-    --lavender-500: #8B44F7;
-    --lavender-600: #7c3aed;
+    --lavender-500: var(--color-primary);
+    --lavender-600: var(--color-primary-dark);
     --lavender-700: #6d28d9;
     --lavender-800: #5b21b6;
     --lavender-900: #4c1d95;
+    
+    /* Spacing and sizing */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
   }
 }
 
@@ -22,7 +45,8 @@ body {
   font-family: 'Playfair Display', serif;
   font-size: 14px;
   line-height: 1.4;
-  background-color: #fafafa;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 /* Compact typography system */
@@ -69,26 +93,54 @@ h6 { font-size: 13px; }
   padding: 0.5rem;
 }
 
-/* Compact panels and cards */
+/* IT Panel Style - Compact panels and cards */
 .panel, .card, [class*="bg-white"], [class*="bg-gray"] {
   padding: 0.5rem !important;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border-light);
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.05);
 }
 
-/* Compact form elements */
-input, select, textarea, button {
+/* IT Panel Style - Compact form elements */
+input, select, textarea {
   font-family: 'Playfair Display', serif !important;
   font-size: 13px !important;
   padding: 0.375rem 0.5rem !important;
-  border-radius: 0.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Compact buttons */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* IT Panel Style - Compact buttons */
 button, .btn {
+  font-family: 'Playfair Display', serif !important;
   font-size: 12px !important;
-  padding: 0.25rem 0.75rem !important;
-  min-height: 32px;
+  padding: 0.375rem 0.75rem !important;
+  min-height: 36px;
+  border-radius: 0.375rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+button:hover, .btn:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
 }
 
 /* Compact tables */
@@ -100,14 +152,30 @@ th, td {
   padding: 0.25rem 0.5rem !important;
 }
 
-/* Compact navigation */
+/* IT Panel Style - Compact navigation */
 nav {
   padding: 0.5rem 1rem !important;
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border-light);
+  backdrop-filter: blur(8px);
 }
 
 nav a, nav button {
   font-size: 13px !important;
-  padding: 0.25rem 0.5rem !important;
+  padding: 0.375rem 0.5rem !important;
+  border-radius: 0.25rem;
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+nav a:hover, nav button:hover {
+  color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+nav a.active {
+  color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 /* Compact dashboard sections */

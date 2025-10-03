@@ -38,18 +38,50 @@ const config: Config = {
         '24': '3rem',
       },
       colors: {
+        // IT Panel Theme Colors
+        primary: {
+          DEFAULT: '#3B82F6',
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        // Keep lavender as secondary
         lavender: {
           50: '#f5f3ff',
           100: '#ede9fe',
           200: '#ddd6fe',
           300: '#c4b5fd',
           400: '#a78bfa',
-          500: '#8B44F7',
-          600: '#7c3aed',
+          500: '#3B82F6', // Map to IT Panel primary
+          600: '#2563EB', // Map to IT Panel primary-dark
           700: '#6d28d9',
           800: '#5b21b6',
           900: '#4c1d95',
         },
+        // IT Panel semantic colors
+        background: {
+          DEFAULT: '#ffffff',
+          secondary: '#f8fafc',
+        },
+        border: {
+          DEFAULT: '#e2e8f0',
+          light: '#f1f5f9',
+        },
+        text: {
+          DEFAULT: '#1e293b',
+          secondary: '#64748b',
+          muted: '#94a3b8',
+        },
+        success: '#10b981',
+        warning: '#f59e0b',
+        error: '#ef4444',
       },
       animation: {
         'slide-in': 'slide-in 0.3s ease-out',
