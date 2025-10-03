@@ -129,7 +129,7 @@ export async function POST(request: NextRequest) {
     
     console.log('Final Results:');
     console.log('  Calculated distance:', distance, 'meters');
-    console.log('  Max allowed (10m rule):', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('  Max allowed (5m rule):', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
     console.log('  Within range:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
     console.log('=== END ENHANCED DEBUG ===');
 
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     console.log('  GPS accuracy reported:', accuracy ? `${accuracy}m` : 'unknown');
     console.log('  Maximum allowed distance:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
     console.log('  Final status:', status === 'P' ? 'PRESENT' : 'ABSENT');
-    console.log('  Validation rule: EXACT distance ≤ 10.000m = PRESENT');
+    console.log('  Validation rule: EXACT distance ≤ 5.000m = PRESENT');
     console.log('  No GPS compensation applied - showing true calculated distance');
 
     // Mark attendance

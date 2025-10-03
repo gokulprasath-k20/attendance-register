@@ -157,7 +157,7 @@ export default function StudentDashboard() {
         } else {
           const exactDistance = data.attendance.distance.toFixed(3);
           showToast(
-            `❌ Attendance marked: ${statusText} - Exact Distance: ${exactDistance}m (Required: ≤ 10.000m)`,
+            `❌ Attendance marked: ${statusText} - Exact Distance: ${exactDistance}m (Required: ≤ 5.000m)`,
             'error'
           );
         }
@@ -271,7 +271,7 @@ export default function StudentDashboard() {
                 🎯 <strong>Millimeter Precision:</strong> Distance calculated using Haversine formula with WGS84 ellipsoid
               </p>
               <p className="text-xs text-blue-700 mt-1">
-                📐 <strong>10-Meter Rule:</strong> Exactly ≤ 10.000m required (e.g., 10.001m = ABSENT)
+                📐 <strong>5-Meter Rule:</strong> Exactly ≤ 5.000m required (e.g., 5.001m = ABSENT)
               </p>
               <p className="text-xs text-blue-700 mt-1">
                 ⚡ Shows exact calculated distance - no GPS compensation applied
