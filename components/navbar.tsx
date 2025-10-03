@@ -58,7 +58,7 @@ export default function Navbar() {
           {/* Center - App Title */}
           <div className="flex flex-col items-center absolute left-1/2 transform -translate-x-1/2 hidden md:flex">
             <div className="text-center">
-              <h1 className="text-base sm:text-lg font-semibold text-gray-800 tracking-wide">Attendance Management System</h1>
+              <h1 className="text-sm sm:text-base font-medium text-gray-800 tracking-wide">Attendance Management System</h1>
             </div>
           </div>
 
