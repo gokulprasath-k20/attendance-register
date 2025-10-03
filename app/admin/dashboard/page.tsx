@@ -79,7 +79,7 @@ export default function AdminDashboard() {
     const records = attendanceData.attendance.map((record: any) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
-      year: record.otp_sessions?.year || 'N/A',
+      year: `${record.otp_sessions?.year || 'N/A'}/${record.otp_sessions?.semester || 'N/A'}`,
       subject: record.otp_sessions?.subject || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
     const records = attendanceData.attendance.map((record: any) => ({
       studentName: record.profiles?.name || 'N/A',
       regNo: record.profiles?.reg_no || 'N/A',
-      year: record.otp_sessions?.year || 'N/A',
+      year: `${record.otp_sessions?.year || 'N/A'}/${record.otp_sessions?.semester || 'N/A'}`,
       subject: record.otp_sessions?.subject || 'N/A',
       date: formatDateForExport(record.created_at),
       time: formatTimeForExport(record.created_at),

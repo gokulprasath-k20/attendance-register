@@ -114,7 +114,7 @@ export const exportToExcel = async (
 
   // Set column headers starting from row 5 (like in the image)
   worksheet.getRow(5).values = [
-    'Student Name', 'Reg No', 'Subject', 'Year', 'Date', 'Time', 'Status', 'Distance (m)'
+    'Student Name', 'Reg No', 'Subject', 'Year/Sem', 'Date', 'Time', 'Status', 'Distance (m)'
   ];
   
   worksheet.columns = [
@@ -278,7 +278,7 @@ export const exportToPDF = async (
 
   // Add table
   autoTable(doc, {
-    head: [['Student Name', 'Reg No', 'Subject', 'Year', 'Date', 'Time', 'Status', 'Distance (m)']],
+    head: [['Student Name', 'Reg No', 'Subject', 'Year/Sem', 'Date', 'Time', 'Status', 'Distance (m)']],
     body: tableData,
     startY: 65,
     theme: 'striped',
