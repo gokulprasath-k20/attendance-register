@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import LoadingSpinner from '@/components/loading-spinner';
 
 export default function Home() {
@@ -49,6 +50,16 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center">
+          <div className="mb-6">
+            <Image
+              src="https://avsec-it.vercel.app/logo.png"
+              alt="College Logo"
+              width={200}
+              height={60}
+              className="h-16 w-auto mx-auto mb-4"
+              priority
+            />
+          </div>
           <h1 className="text-1xl font-bold text-gray-900 mb-8">
             Attendance Management System
           </h1>
