@@ -168,10 +168,10 @@ export default function StaffDashboard() {
     e.preventDefault();
 
     try {
-      showToast('Getting your precise location for 10-meter rule OTP...', 'success');
-      const location = await getAccurateLocation(5);
+      showToast('Getting your location for OTP...', 'success');
+      const location = await getCurrentLocation(); // Single attempt for speed
       
-      console.log('✅ Staff location for OTP (high-precision):', {
+      console.log('✅ Staff location for OTP:', {
         coordinates: `${location.latitude.toFixed(8)}, ${location.longitude.toFixed(8)}`,
         accuracy: `${location.accuracy.toFixed(1)}m`,
         timestamp: new Date().toISOString()

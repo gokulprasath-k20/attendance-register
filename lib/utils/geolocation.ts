@@ -111,7 +111,7 @@ export const calculateDistance = (
   
   const distance = R * c; // Distance in meters
   
-  // Enhanced logging for debugging
+  // Enhanced logging for debugging nearby devices
   console.log('=== HIGH-PRECISION DISTANCE CALCULATION ===');
   console.log('Input coordinates:');
   console.log(`  Staff: ${lat1.toFixed(8)}, ${lon1.toFixed(8)}`);
@@ -119,11 +119,22 @@ export const calculateDistance = (
   console.log('Coordinate differences:');
   console.log(`  Δφ (lat diff): ${(lat2 - lat1).toFixed(8)} degrees`);
   console.log(`  Δλ (lng diff): ${(lon2 - lon1).toFixed(8)} degrees`);
+  console.log(`  Distance between coordinates: ${Math.abs(lat2 - lat1) + Math.abs(lon2 - lon1)} degrees`);
   console.log('Calculation steps:');
   console.log(`  a = ${a.toFixed(12)}`);
   console.log(`  c = ${c.toFixed(12)}`);
   console.log(`  Raw distance: ${distance.toFixed(6)} meters`);
   console.log(`  Final distance: ${Math.round(distance * 1000) / 1000} meters`);
+  
+  // Special handling for very close devices
+  if (distance < 0.1) {
+    console.log('⚠️  VERY CLOSE DEVICES DETECTED - Distance < 0.1m');
+    console.log('   This might be GPS accuracy issue or same device testing');
+  }
+  if (distance > 50 && Math.abs(lat2 - lat1) + Math.abs(lon2 - lon1) < 0.001) {
+    console.log('⚠️  POSSIBLE GPS ACCURACY ISSUE - Large distance but small coordinate difference');
+  }
+  
   console.log('=== END CALCULATION ===');
 
   // Return with 3 decimal places precision (millimeter accuracy)
@@ -298,6 +309,7 @@ export const getQuickLocation = async (): Promise<LocationResult> => {
 
 /**
  * Test distance calculation with known coordinates for validation
+ * @returns Test results
  */
 export const testDistanceCalculation = () => {
   console.log('=== DISTANCE CALCULATION ACCURACY TEST ===');
@@ -326,4 +338,38 @@ export const testDistanceCalculation = () => {
     tenMeters: dist3,
     hundredMeters: dist4
   };
+};
+
+/**
+ * Debug function for nearby devices showing "too far"
+ * Call this in browser console to test with your actual coordinates
+ * @param staffLat Staff latitude
+ * @param staffLng Staff longitude
+ * @param studentLat Student latitude
+ * @param studentLng Student longitude
+ * @returns Debug results
+ */
+export const debugNearbyDevices = (staffLat: number, staffLng: number, studentLat: number, studentLng: number) => {
+  console.log('=== DEBUGGING NEARBY DEVICES ===');
+  console.log('Staff coordinates:', staffLat.toFixed(8), staffLng.toFixed(8));
+  console.log('Student coordinates:', studentLat.toFixed(8), studentLng.toFixed(8));
+  
+  const distance = calculateDistance(staffLat, staffLng, studentLat, studentLng);
+  const formatted = formatDistance(distance);
+  
+  console.log('Calculated distance:', distance, 'meters');
+  console.log('Formatted display:', formatted);
+  console.log('Within 10m rule?', distance <= 10 ? 'YES' : 'NO');
+  
+  // GPS accuracy recommendations
+  if (distance > 10) {
+    console.log('🔧 TROUBLESHOOTING TIPS:');
+    console.log('1. Ensure both devices have GPS enabled');
+    console.log('2. Move outside or near windows for better GPS signal');
+    console.log('3. Wait 30 seconds for GPS to stabilize');
+    console.log('4. Check if devices are using different GPS providers');
+    console.log('5. Try refreshing location on both devices');
+  }
+  
+  return { distance, formatted, withinRange: distance <= 10 };
 };

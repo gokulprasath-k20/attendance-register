@@ -270,6 +270,18 @@ export default function StudentDashboard() {
                 ⚡ Optimized for quick attendance marking - location will be obtained instantly.
               </p>
             </div>
+            
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>🔧 If showing "Too far" when nearby:</strong>
+              </p>
+              <ul className="text-xs text-blue-700 mt-1 space-y-1">
+                <li>• Ensure GPS is enabled on both devices</li>
+                <li>• Move outside or near windows for better signal</li>
+                <li>• Wait 30 seconds for GPS to stabilize</li>
+                <li>• Check browser console for distance calculation logs</li>
+              </ul>
+            </div>
             {studentInfo && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
