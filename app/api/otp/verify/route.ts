@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { otpCode, latitude, longitude, selectedSubject } = body;
+    const { otpCode, latitude, longitude, selectedSubject, accuracy } = body;
 
     if (!otpCode || !latitude || !longitude) {
       return NextResponse.json(
@@ -101,37 +101,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate distance
-    console.log('=== DISTANCE CALCULATION DEBUG ===');
-    console.log('Student coords:', { lat: latitude, lng: longitude });
+    // Calculate distance with GPS accuracy analysis
+    console.log('=== ENHANCED DISTANCE CALCULATION FOR NEARBY DEVICES ===');
+    console.log('Student coords:', { lat: latitude, lng: longitude, accuracy: accuracy || 'unknown' });
     console.log('Staff coords:', { lat: session_data.admin_lat, lng: session_data.admin_lng });
     
+    // GPS accuracy analysis for nearby device detection
+    if (accuracy) {
+      console.log('GPS Accuracy Analysis:');
+      if (accuracy <= 5) {
+        console.log('  ✅ EXCELLENT GPS accuracy - reliable for nearby device detection');
+      } else if (accuracy <= 10) {
+        console.log('  ✅ GOOD GPS accuracy - suitable for nearby device detection');
+      } else if (accuracy <= 20) {
+        console.log('  ⚠️ MODERATE GPS accuracy - may affect nearby device detection');
+      } else {
+        console.log('  ❌ POOR GPS accuracy - nearby device detection unreliable');
+      }
+    }
+    
     const distance = calculateDistance(
-      latitude,
-      longitude,
       session_data.admin_lat,
-      session_data.admin_lng
+      session_data.admin_lng,
+      latitude,
+      longitude
     );
     
-    console.log('Calculated distance:', distance, 'meters');
-    console.log('Max allowed distance (10m rule):', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
-    console.log('Within 10m radius:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
-    console.log('=== END DEBUG ===');
+    console.log('Final Results:');
+    console.log('  Calculated distance:', distance, 'meters');
+    console.log('  Max allowed (10m rule):', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
+    console.log('  Within range:', distance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS);
+    console.log('=== END ENHANCED DEBUG ===');
 
-    // Determine status - STRICT 10-meter rule (exactly 10.0m or less)
-    // Round distance to 1 decimal place for precise comparison
+    // Enhanced status determination for nearby devices with GPS accuracy consideration
     const roundedDistance = Math.round(distance * 10) / 10;
-    const status =
-      roundedDistance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
-        ? ATTENDANCE_CONFIG.STATUS.PRESENT
-        : ATTENDANCE_CONFIG.STATUS.ABSENT;
     
-    console.log('Distance validation:');
+    // Special handling for very close coordinates with GPS accuracy issues
+    let status = roundedDistance <= ATTENDANCE_CONFIG.MAX_DISTANCE_METERS
+      ? ATTENDANCE_CONFIG.STATUS.PRESENT
+      : ATTENDANCE_CONFIG.STATUS.ABSENT;
+    
+    // GPS accuracy compensation for nearby devices
+    if (status === ATTENDANCE_CONFIG.STATUS.ABSENT && accuracy && accuracy > 15) {
+      // If GPS accuracy is poor (>15m) but calculated distance is close to threshold
+      if (roundedDistance <= 15 && roundedDistance > 10) {
+        console.log('🎯 GPS ACCURACY COMPENSATION APPLIED');
+        console.log(`   Poor GPS accuracy (${accuracy}m) with distance ${roundedDistance}m`);
+        console.log('   Distance close to threshold - considering as PRESENT for nearby devices');
+        status = ATTENDANCE_CONFIG.STATUS.PRESENT;
+      }
+    }
+    
+    console.log('Enhanced Distance Validation:');
     console.log('  Raw distance:', distance.toFixed(6), 'meters');
     console.log('  Rounded distance:', roundedDistance, 'meters');
+    console.log('  GPS accuracy:', accuracy ? `${accuracy}m` : 'unknown');
     console.log('  Max allowed:', ATTENDANCE_CONFIG.MAX_DISTANCE_METERS, 'meters');
-    console.log('  Status:', status === 'P' ? 'PRESENT' : 'ABSENT');
-    console.log('  Rule: Distance must be ≤ 10.0m (10.1m = ABSENT)');
+    console.log('  Final status:', status === 'P' ? 'PRESENT' : 'ABSENT');
+    console.log('  Rule: Distance ≤ 10.0m OR (≤ 15m with poor GPS accuracy)');
 
     // Mark attendance
     const { data: attendance, error: attendanceError } = await supabase

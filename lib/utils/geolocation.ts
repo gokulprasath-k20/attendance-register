@@ -9,21 +9,30 @@ export interface Coordinates {
   latitude: number;
   longitude: number;
 }
-
 export interface LocationResult extends Coordinates {
   accuracy: number;
+  timestamp: number;
 }
 
 /**
- * Get current user location using HTML5 Geolocation API with enhanced accuracy
- * @returns Promise with coordinates and accuracy
+ * Get current user location using HTML5 Geolocation API with enhanced accuracy for nearby devices
+ * @returns Promise with location result including accuracy and timestamp
  */
 export const getCurrentLocation = (): Promise<LocationResult> => {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported by your browser'));
+      reject(new Error('Geolocation is not supported by this browser'));
       return;
     }
+
+    // Enhanced options for better accuracy when devices are close
+    const options: PositionOptions = {
+      enableHighAccuracy: true,
+      timeout: 20000, // Increased timeout for better accuracy
+      maximumAge: 0, // Always get fresh location
+    };
+
+    console.log('Getting enhanced location for nearby device detection...');
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -31,24 +40,34 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
+          timestamp: position.timestamp,
         };
-        
-        console.log('Location obtained:', {
-          ...result,
-          timestamp: new Date().toISOString()
+
+        console.log('Location acquired:', {
+          coordinates: `${result.latitude.toFixed(8)}, ${result.longitude.toFixed(8)}`,
+          accuracy: `${result.accuracy.toFixed(1)}m`,
+          timestamp: new Date(result.timestamp).toISOString()
         });
-        
+
+        // Log GPS quality for nearby device scenarios
+        if (result.accuracy <= 5) {
+          console.log('EXCELLENT GPS accuracy for nearby device detection');
+        } else if (result.accuracy <= 10) {
+          console.log('GOOD GPS accuracy for nearby device detection');
+        } else if (result.accuracy <= 20) {
+          console.log('MODERATE GPS accuracy - may affect nearby device detection');
+        } else {
+          console.log('POOR GPS accuracy - nearby device detection may be unreliable');
+        }
+
         resolve(result);
       },
       (error) => {
-        const errorMessage = handleLocationError(error);
-        reject(new Error(errorMessage));
+        console.error('❌ Location acquisition failed:', error.message);
+        handleLocationError(error);
+        reject(error);
       },
-      {
-        enableHighAccuracy: true,
-        timeout: 30000, // 30 seconds timeout
-        maximumAge: 0, // Don't use cached position
-      }
+      options
     );
   });
 };
@@ -91,7 +110,36 @@ export const calculateDistance = (
     throw new Error(`Invalid longitude values: lon1=${lon1}, lon2=${lon2}`);
   }
 
-  // Use high-precision Earth radius
+  // Calculate coordinate differences first for GPS accuracy analysis
+  const latDiff = Math.abs(lat2 - lat1);
+  const lonDiff = Math.abs(lon2 - lon1);
+  const totalCoordDiff = latDiff + lonDiff;
+
+  // Enhanced logging for debugging nearby devices
+  console.log('=== ENHANCED DISTANCE CALCULATION FOR NEARBY DEVICES ===');
+  console.log('Input coordinates:');
+  console.log(`  Staff: ${lat1.toFixed(8)}, ${lon1.toFixed(8)}`);
+  console.log(`  Student: ${lat2.toFixed(8)}, ${lon2.toFixed(8)}`);
+  console.log('Coordinate analysis:');
+  console.log(`  Latitude difference: ${latDiff.toFixed(8)} degrees`);
+  console.log(`  Longitude difference: ${lonDiff.toFixed(8)} degrees`);
+  console.log(`  Total coordinate difference: ${totalCoordDiff.toFixed(8)} degrees`);
+
+  // GPS accuracy compensation for very close devices
+  // If coordinate difference is extremely small, likely same location with GPS noise
+  if (totalCoordDiff < 0.0001) { // ~11 meters at equator
+    console.log('🎯 VERY CLOSE COORDINATES DETECTED');
+    console.log('   Coordinate difference < 0.0001° (~11m) - likely GPS noise');
+    console.log('   Applying GPS accuracy compensation for nearby devices');
+    
+    // For very close coordinates, return a small distance to account for GPS accuracy
+    const compensatedDistance = totalCoordDiff * 111000; // Rough conversion to meters
+    console.log(`   Compensated distance: ${compensatedDistance.toFixed(3)} meters`);
+    console.log('=== END ENHANCED CALCULATION ===');
+    return Math.max(0.1, compensatedDistance); // Minimum 0.1m, but likely very close
+  }
+
+  // Use high-precision Earth radius for normal calculation
   const R = 6371008.8; // Earth's radius in meters (WGS84 ellipsoid mean radius)
   
   // Convert to radians with high precision
@@ -111,31 +159,34 @@ export const calculateDistance = (
   
   const distance = R * c; // Distance in meters
   
-  // Enhanced logging for debugging nearby devices
-  console.log('=== HIGH-PRECISION DISTANCE CALCULATION ===');
-  console.log('Input coordinates:');
-  console.log(`  Staff: ${lat1.toFixed(8)}, ${lon1.toFixed(8)}`);
-  console.log(`  Student: ${lat2.toFixed(8)}, ${lon2.toFixed(8)}`);
-  console.log('Coordinate differences:');
-  console.log(`  Δφ (lat diff): ${(lat2 - lat1).toFixed(8)} degrees`);
-  console.log(`  Δλ (lng diff): ${(lon2 - lon1).toFixed(8)} degrees`);
-  console.log(`  Distance between coordinates: ${Math.abs(lat2 - lat1) + Math.abs(lon2 - lon1)} degrees`);
-  console.log('Calculation steps:');
+  console.log('Haversine calculation:');
   console.log(`  a = ${a.toFixed(12)}`);
   console.log(`  c = ${c.toFixed(12)}`);
   console.log(`  Raw distance: ${distance.toFixed(6)} meters`);
-  console.log(`  Final distance: ${Math.round(distance * 1000) / 1000} meters`);
+  
+  // GPS accuracy analysis and compensation
+  if (distance > 20 && totalCoordDiff < 0.0002) {
+    console.log('⚠️  GPS ACCURACY ISSUE DETECTED');
+    console.log(`   Large calculated distance (${distance.toFixed(1)}m) but small coordinate diff`);
+    console.log('   This suggests GPS accuracy problems - applying compensation');
+    
+    // Apply GPS accuracy compensation - use coordinate-based estimation
+    const estimatedDistance = totalCoordDiff * 111000; // Convert degrees to meters
+    const compensatedDistance = Math.min(distance, estimatedDistance);
+    console.log(`   Coordinate-based estimate: ${estimatedDistance.toFixed(3)} meters`);
+    console.log(`   Compensated distance: ${compensatedDistance.toFixed(3)} meters`);
+    console.log('=== END ENHANCED CALCULATION ===');
+    return Math.round(compensatedDistance * 1000) / 1000;
+  }
   
   // Special handling for very close devices
-  if (distance < 0.1) {
-    console.log('⚠️  VERY CLOSE DEVICES DETECTED - Distance < 0.1m');
-    console.log('   This might be GPS accuracy issue or same device testing');
-  }
-  if (distance > 50 && Math.abs(lat2 - lat1) + Math.abs(lon2 - lon1) < 0.001) {
-    console.log('⚠️  POSSIBLE GPS ACCURACY ISSUE - Large distance but small coordinate difference');
+  if (distance < 0.5) {
+    console.log('✅ VERY CLOSE DEVICES - Distance < 0.5m');
+    console.log('   Devices are genuinely close together');
   }
   
-  console.log('=== END CALCULATION ===');
+  console.log(`  Final distance: ${Math.round(distance * 1000) / 1000} meters`);
+  console.log('=== END ENHANCED CALCULATION ===');
 
   // Return with 3 decimal places precision (millimeter accuracy)
   return Math.round(distance * 1000) / 1000;
