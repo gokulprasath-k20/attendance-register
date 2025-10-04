@@ -14,7 +14,7 @@ export default function AuthNavbar() {
                 alt="Logo"
                 width={800}
                 height={200}
-                className="h-16 w-auto"
+                className="h-20 w-auto"
                 priority
               />
             </Link>

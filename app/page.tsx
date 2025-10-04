@@ -56,7 +56,7 @@ export default function Home() {
               alt="AVS Engineering College Logo"
               width={800}
               height={200}
-              className="h-16 w-auto mx-auto mb-4"
+              className="h-20 w-auto mx-auto mb-4"
               priority
             />
           </div>

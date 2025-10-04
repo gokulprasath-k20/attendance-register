@@ -52,26 +52,31 @@ export const exportToExcel = async (
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Attendance Report');
 
-  // Create header with college branding like the image
+  // Create professional header with college branding
   worksheet.mergeCells('A1:I3');
   const headerCell = worksheet.getCell('A1');
   
-  // Add college header with logos and text
-  headerCell.value = 'AVS ENGINEERING COLLEGE\nDepartment of Information Technology';
+  // Set row heights for better spacing
+  worksheet.getRow(1).height = 25;
+  worksheet.getRow(2).height = 25;
+  worksheet.getRow(3).height = 25;
+  
+  // Add college header with professional styling
+  headerCell.value = 'AVS ENGINEERING COLLEGE';
   headerCell.font = { 
     bold: true, 
-    size: 20, 
-    color: { argb: 'FF0066CC' }, // Blue color like in image
+    size: 24, 
+    color: { argb: 'FF0066CC' }, // Professional blue
     name: 'Arial'
   };
-  headerCell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+  headerCell.alignment = { vertical: 'middle', horizontal: 'center' };
   headerCell.fill = {
     type: 'pattern',
     pattern: 'solid',
     fgColor: { argb: 'FFFFFFFF' }, // White background
   };
 
-  // Add border to header
+  // Add border to header with professional styling
   headerCell.border = {
     top: { style: 'thick', color: { argb: 'FF000000' } },
     left: { style: 'thick', color: { argb: 'FF000000' } },
@@ -79,42 +84,34 @@ export const exportToExcel = async (
     right: { style: 'thick', color: { argb: 'FF000000' } }
   };
 
-  // Add logo images
+  // Add centered logo placement
   try {
     const logoBase64 = await getLogoBase64();
     if (logoBase64) {
-      // Left logo
-      const leftLogoId = workbook.addImage({
+      // Single centered logo
+      const logoId = workbook.addImage({
         base64: logoBase64,
         extension: 'png',
       });
-      worksheet.addImage(leftLogoId, {
-        tl: { col: 0, row: 0 },
-        ext: { width: 60, height: 60 }
-      });
-
-      // Right logo (same logo for now, you can change this)
-      const rightLogoId = workbook.addImage({
-        base64: logoBase64,
-        extension: 'png',
-      });
-      worksheet.addImage(rightLogoId, {
-        tl: { col: 7.5, row: 0 },
-        ext: { width: 60, height: 60 }
+      worksheet.addImage(logoId, {
+        tl: { col: 4, row: 0.2 }, // Centered position
+        ext: { width: 80, height: 80 }
       });
     }
   } catch (error) {
     console.log('Could not load logo for Excel export:', error);
   }
 
-  // Add college logo note
-  worksheet.getCell('A4').value = 'College Logo: logo (1).png';
-  worksheet.getCell('A4').font = { size: 10, italic: true, color: { argb: 'FF666666' } };
-  worksheet.getCell('A4').alignment = { horizontal: 'left' };
+  // Add department subtitle
+  worksheet.getCell('A4').value = 'Department of Information Technology';
+  worksheet.getCell('A4').font = { size: 14, bold: true, color: { argb: 'FF0066CC' } };
+  worksheet.getCell('A4').alignment = { horizontal: 'center' };
+  worksheet.mergeCells('A4:I4');
 
-  // Set column headers starting from row 5 (like in the image)
-  worksheet.getRow(5).values = [
-    'Student Name', 'Reg No', 'Subject', 'Year/Sem', 'Date', 'Time', 'Status', 'Distance (m)'
+  // Add spacing and set column headers starting from row 6
+  worksheet.getRow(5).height = 10; // Spacing row
+  worksheet.getRow(6).values = [
+    'Student Name', 'Reg No', 'Subject', 'Year', 'Date', 'Time', 'Status', 'Distance (m)'
   ];
   
   worksheet.columns = [
@@ -128,17 +125,18 @@ export const exportToExcel = async (
     { key: 'distance', width: 12 },
   ];
 
-  // Style column header row (row 5)
-  worksheet.getRow(5).font = { bold: true, size: 11 };
-  worksheet.getRow(5).fill = {
+  // Style column header row (row 6)
+  worksheet.getRow(6).font = { bold: true, size: 11 };
+  worksheet.getRow(6).fill = {
     type: 'pattern',
     pattern: 'solid',
-    fgColor: { argb: 'FFE6E6FA' }, // Light gray like in image
+    fgColor: { argb: 'FFE6E6FA' }, // Light lavender like in image
   };
-  worksheet.getRow(5).alignment = { vertical: 'middle', horizontal: 'center' };
+  worksheet.getRow(6).alignment = { vertical: 'middle', horizontal: 'center' };
+  worksheet.getRow(6).height = 20;
   
   // Add borders to header row
-  worksheet.getRow(5).eachCell((cell) => {
+  worksheet.getRow(6).eachCell((cell) => {
     cell.border = {
       top: { style: 'thin', color: { argb: 'FF000000' } },
       left: { style: 'thin', color: { argb: 'FF000000' } },
@@ -147,8 +145,8 @@ export const exportToExcel = async (
     };
   });
 
-  // Add data rows starting from row 6
-  let currentRow = 6;
+  // Add data rows starting from row 7
+  let currentRow = 7;
   data.forEach((record) => {
     const row = worksheet.getRow(currentRow);
     row.values = [
@@ -226,43 +224,47 @@ export const exportToPDF = async (
 ) => {
   const doc = new jsPDF();
 
-  // Add college header matching Excel format
-  doc.setFontSize(18);
-  doc.setTextColor(0, 102, 204); // Blue color
-  doc.text('AVS ENGINEERING COLLEGE', 105, 15, { align: 'center' });
+  // Add professional college header matching Excel format
+  doc.setFontSize(20);
+  doc.setTextColor(0, 102, 204); // Professional blue
+  doc.text('AVS ENGINEERING COLLEGE', 105, 18, { align: 'center' });
   
-  // Add department name
-  doc.setFontSize(14);
-  doc.setTextColor(0, 102, 204); // Blue color
-  doc.text('Department of Information Technology', 105, 25, { align: 'center' });
+  // Add department name with proper spacing
+  doc.setFontSize(12);
+  doc.setTextColor(0, 102, 204); // Professional blue
+  doc.text('Department of Information Technology', 105, 28, { align: 'center' });
   
-  // Add logos matching Excel layout
+  // Add centered logo matching Excel layout
   try {
     const logoBase64 = await getLogoBase64();
     if (logoBase64) {
-      // Left logo
-      doc.addImage(logoBase64, 'PNG', 15, 8, 20, 20);
-      // Right logo  
-      doc.addImage(logoBase64, 'PNG', 175, 8, 20, 20);
+      // Single centered logo - AVS Engineering College logo
+      doc.addImage(logoBase64, 'PNG', 92, 6, 28, 28); // Centered position
     }
   } catch (error) {
     console.log('Could not load logo for PDF export:', error);
   }
 
-  // Add border around header area
+  // Add professional border around header area
   doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.5);
-  doc.rect(10, 5, 190, 25);
+  doc.setLineWidth(1);
+  doc.rect(8, 3, 194, 30);
+  
+  // Add subtle background for header
+  doc.setFillColor(248, 249, 250); // Very light gray
+  doc.rect(8, 3, 194, 30, 'F');
+  doc.rect(8, 3, 194, 30); // Border on top
 
-  // Add title below header
-  doc.setFontSize(14);
+  // Add title below header with better spacing
+  doc.setFontSize(16);
   doc.setTextColor(0, 0, 0);
-  doc.text(title, 105, 40, { align: 'center' });
+  doc.text(title, 105, 45, { align: 'center' });
 
-  // Add metadata
+  // Add metadata with professional formatting
   doc.setFontSize(10);
-  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 50);
-  doc.text(`Total Records: ${data.length}`, 14, 55);
+  doc.setTextColor(100, 100, 100); // Gray color
+  doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 55);
+  doc.text(`Total Records: ${data.length}`, 14, 60);
 
   // Prepare table data with year column
   const tableData = data.map((record) => [
@@ -280,7 +282,7 @@ export const exportToPDF = async (
   autoTable(doc, {
     head: [['Student Name', 'Reg No', 'Subject', 'Year/Sem', 'Date', 'Time', 'Status', 'Distance (m)']],
     body: tableData,
-    startY: 65,
+    startY: 70,
     theme: 'striped',
     headStyles: {
       fillColor: [230, 230, 250], // Lavender
@@ -298,12 +300,12 @@ export const exportToPDF = async (
       },
     },
     didParseCell: (data) => {
-      // Color code status column
-      if (data.column.index === 5 && data.section === 'body') {
+      // Color code status column (index 6 for Status)
+      if (data.column.index === 6 && data.section === 'body') {
         const status = data.cell.raw as string;
-        if (status === 'P') {
+        if (status === 'Present') {
           data.cell.styles.fillColor = [144, 238, 144]; // Light green
-        } else if (status === 'A') {
+        } else if (status === 'Absent') {
           data.cell.styles.fillColor = [255, 204, 203]; // Light red
         }
       }
