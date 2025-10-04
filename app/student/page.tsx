@@ -263,32 +263,6 @@ export default function StudentDashboard() {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Mark Attendance
             </h2>
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>📏 EXACT DISTANCE CALCULATION:</strong> Final Year Project - Precise GPS Distance Measurement
-              </p>
-              <p className="text-xs text-blue-700 mt-1">
-                🎯 <strong>Millimeter Precision:</strong> Distance calculated using Haversine formula with WGS84 ellipsoid
-              </p>
-              <p className="text-xs text-blue-700 mt-1">
-                📐 <strong>5-Meter Rule:</strong> Exactly ≤ 5.000m required (e.g., 5.001m = ABSENT)
-              </p>
-              <p className="text-xs text-blue-700 mt-1">
-                ⚡ Shows exact calculated distance - no GPS compensation applied
-              </p>
-            </div>
-            
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>🔧 If showing "Too far" when nearby:</strong>
-              </p>
-              <ul className="text-xs text-blue-700 mt-1 space-y-1">
-                <li>• Ensure GPS is enabled on both devices</li>
-                <li>• Move outside or near windows for better signal</li>
-                <li>• Wait 30 seconds for GPS to stabilize</li>
-                <li>• Check browser console for distance calculation logs</li>
-              </ul>
-            </div>
             {studentInfo && (
               <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
