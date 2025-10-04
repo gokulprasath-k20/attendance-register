@@ -35,9 +35,11 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
       maximumAge: 0, // Never use cached position
     };
 
-    const MAX_ACCURACY_THRESHOLD = 15; // Reject readings worse than 15m
-    const MAX_ATTEMPTS = 5;
-    const DELAY_BETWEEN_READINGS = 2000; // 2 seconds between readings
+    // Dynamic accuracy thresholds based on environment
+    const OUTDOOR_ACCURACY_THRESHOLD = 15; // Outdoor GPS should be ≤15m
+    const INDOOR_ACCURACY_THRESHOLD = 25;  // Indoor GPS can be ≤25m (classroom scenario)
+    const MAX_ATTEMPTS = 7; // More attempts for indoor scenarios
+    const DELAY_BETWEEN_READINGS = 3000; // 3 seconds for better indoor GPS stabilization
 
     try {
       const validReadings: LocationResult[] = [];
@@ -60,14 +62,18 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
                 
                 console.log(`  Reading: ${result.latitude.toFixed(8)}, ${result.longitude.toFixed(8)} (±${result.accuracy.toFixed(1)}m)`);
                 
-                // Validate GPS accuracy
-                if (result.accuracy > MAX_ACCURACY_THRESHOLD) {
-                  console.log(`  ❌ Rejected: Poor accuracy (${result.accuracy.toFixed(1)}m > ${MAX_ACCURACY_THRESHOLD}m)`);
-                  rejectReading(new Error(`GPS accuracy too poor: ${result.accuracy.toFixed(1)}m`));
+                // Smart GPS accuracy validation based on environment
+                const isLikelyIndoor = result.accuracy > 20; // Heuristic: >20m accuracy suggests indoor
+                const threshold = isLikelyIndoor ? INDOOR_ACCURACY_THRESHOLD : OUTDOOR_ACCURACY_THRESHOLD;
+                const environment = isLikelyIndoor ? 'INDOOR' : 'OUTDOOR';
+                
+                if (result.accuracy > threshold) {
+                  console.log(`  ❌ Rejected: Poor ${environment} accuracy (${result.accuracy.toFixed(1)}m > ${threshold}m)`);
+                  rejectReading(new Error(`GPS accuracy too poor for ${environment}: ${result.accuracy.toFixed(1)}m`));
                   return;
                 }
                 
-                console.log(`  ✅ Accepted: Good accuracy (${result.accuracy.toFixed(1)}m ≤ ${MAX_ACCURACY_THRESHOLD}m)`);
+                console.log(`  ✅ Accepted: Good ${environment} accuracy (${result.accuracy.toFixed(1)}m ≤ ${threshold}m)`);
                 resolveReading(result);
               },
               rejectReading,
@@ -94,20 +100,33 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
       }
 
       if (validReadings.length === 0) {
-        throw new Error(`No valid GPS readings obtained after ${attempts} attempts. All readings had accuracy > ${MAX_ACCURACY_THRESHOLD}m`);
+        throw new Error(`No valid GPS readings obtained after ${attempts} attempts. Try moving near a window or outdoors for better GPS signal.`);
       }
 
-      console.log(`📊 GPS VALIDATION RESULTS:`);
-      console.log(`  Valid readings collected: ${validReadings.length}/${attempts}`);
-      console.log(`  Accuracy threshold: ≤${MAX_ACCURACY_THRESHOLD}m`);
-
-      // Use weighted average based on accuracy (better accuracy = higher weight)
-      const weights = validReadings.map(r => 1 / r.accuracy);
-      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+      // Detect environment based on GPS accuracy patterns
+      const avgAccuracy = validReadings.reduce((sum, r) => sum + r.accuracy, 0) / validReadings.length;
+      const isIndoorEnvironment = avgAccuracy > 20;
+      const environment = isIndoorEnvironment ? 'INDOOR (Classroom)' : 'OUTDOOR';
       
+      console.log(`📊 GPS VALIDATION RESULTS:`);
+      console.log(`  Environment detected: ${environment}`);
+      console.log(`  Valid readings collected: ${validReadings.length}/${attempts}`);
+      console.log(`  Average accuracy: ${avgAccuracy.toFixed(1)}m`);
+      console.log(`  Accuracy threshold used: ≤${isIndoorEnvironment ? INDOOR_ACCURACY_THRESHOLD : OUTDOOR_ACCURACY_THRESHOLD}m`);
+
+      // Enhanced weighted average for indoor scenarios
+      let weights: number[];
+      if (isIndoorEnvironment) {
+        // For indoor: Use more conservative weighting (less emphasis on accuracy differences)
+        weights = validReadings.map(r => 1 / Math.sqrt(r.accuracy));
+      } else {
+        // For outdoor: Standard weighting (higher emphasis on accuracy)
+        weights = validReadings.map(r => 1 / r.accuracy);
+      }
+      
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       const avgLatitude = validReadings.reduce((sum, r, i) => sum + (r.latitude * weights[i]), 0) / totalWeight;
       const avgLongitude = validReadings.reduce((sum, r, i) => sum + (r.longitude * weights[i]), 0) / totalWeight;
-      const avgAccuracy = validReadings.reduce((sum, r) => sum + r.accuracy, 0) / validReadings.length;
       
       // Find the most recent timestamp
       const latestTimestamp = Math.max(...validReadings.map(r => r.timestamp));
@@ -121,10 +140,12 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
       };
 
       console.log('✅ FINAL VALIDATED LOCATION:');
+      console.log(`  Environment: ${environment}`);
       console.log(`  Coordinates: ${stabilizedResult.latitude.toFixed(6)}, ${stabilizedResult.longitude.toFixed(6)}`);
       console.log(`  Average accuracy: ±${stabilizedResult.accuracy}m`);
-      console.log(`  Readings used: ${validReadings.length} (weighted average)`);
-      console.log(`  GPS validation: PASSED (all readings ≤${MAX_ACCURACY_THRESHOLD}m)`);
+      console.log(`  Readings used: ${validReadings.length} (${isIndoorEnvironment ? 'indoor-optimized' : 'standard'} weighted average)`);
+      console.log(`  GPS validation: PASSED for ${environment} environment`);
+      console.log(`  ${isIndoorEnvironment ? '🏢 Indoor GPS compensation applied' : '🌍 Outdoor GPS precision maintained'}`);
 
       resolve(stabilizedResult);
 
@@ -153,8 +174,8 @@ export function verifyPresence(
   studentLat: number,
   studentLon: number,
   studentAccuracy: number,
-  threshold = 25 // Increased from 11m to 25m for GPS drift tolerance
-): { distance: number; effective: number; isPresent: boolean; method: string } {
+  threshold = 25 // Base threshold, will be adjusted for indoor scenarios
+): { distance: number; effective: number; isPresent: boolean; method: string; environment: string } {
   // Choose distance calculation method based on expected range
   const roughDistance = Math.abs(staffLat - studentLat) + Math.abs(staffLon - studentLon);
   const roughMeters = roughDistance * 111000; // Approximate meters
@@ -176,26 +197,43 @@ export function verifyPresence(
   // Effective distance after subtracting GPS uncertainty
   const effective = Math.max(0, distance - (studentAccuracy || 0));
   
-  // Conservative approach: Present if distance <= threshold + accuracy buffer
-  const accuracyBuffer = Math.min(studentAccuracy || 0, 10); // Cap accuracy buffer at 10m
-  const effectiveThreshold = threshold + accuracyBuffer;
+  // Smart environment-based attendance verification
+  const isIndoorScenario = (studentAccuracy || 0) > 20; // Heuristic for indoor detection
+  const environment = isIndoorScenario ? 'INDOOR (Classroom)' : 'OUTDOOR';
+  
+  // Adjust thresholds based on environment
+  let adjustedThreshold = threshold;
+  let accuracyBuffer = Math.min(studentAccuracy || 0, 10);
+  
+  if (isIndoorScenario) {
+    // Indoor: More lenient thresholds due to GPS limitations
+    adjustedThreshold = Math.max(threshold, 30); // Minimum 30m for indoor
+    accuracyBuffer = Math.min(studentAccuracy || 0, 20); // Higher accuracy buffer for indoor
+    console.log(`  🏢 Indoor scenario detected - using enhanced tolerance`);
+  }
+  
+  const effectiveThreshold = adjustedThreshold + accuracyBuffer;
   const isPresent = distance <= effectiveThreshold;
   
-  console.log('🎯 ENHANCED ATTENDANCE VERIFICATION');
+  console.log('🎯 SMART ATTENDANCE VERIFICATION');
+  console.log(`  Environment: ${environment}`);
   console.log(`  Calculation method: ${method}`);
   console.log(`  Raw distance: ${distance.toFixed(3)}m`);
   console.log(`  GPS accuracy: ±${studentAccuracy?.toFixed(1) || 0}m`);
   console.log(`  Effective distance: ${effective.toFixed(3)}m (distance - accuracy)`);
   console.log(`  Base threshold: ${threshold}m`);
-  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (capped at 10m)`);
+  console.log(`  Adjusted threshold: ${adjustedThreshold}m (${isIndoorScenario ? 'indoor enhanced' : 'standard'})`);
+  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (${isIndoorScenario ? 'indoor: ≤20m' : 'outdoor: ≤10m'})`);
   console.log(`  Final threshold: ${effectiveThreshold.toFixed(1)}m`);
   console.log(`  Result: ${isPresent ? 'PRESENT ✅' : 'ABSENT ❌'}`);
+  console.log(`  ${isIndoorScenario ? '🏢 Indoor GPS compensation applied' : '🌍 Standard outdoor verification'}`);
   
   return { 
     distance: +distance.toFixed(3), 
     effective: +effective.toFixed(3), 
     isPresent,
-    method
+    method,
+    environment
   };
 }
 
@@ -253,8 +291,8 @@ export const verifyAttendance = (
   staffCoords: Coordinates,
   studentCoords: Coordinates,
   accuracy: number,
-  threshold: number = 25 // Increased from 11m to 25m
-): { distance: number; isPresent: boolean; effectiveThreshold: number; method: string } => {
+  threshold: number = 25 // Base threshold, adjusted for environment
+): { distance: number; isPresent: boolean; effectiveThreshold: number; method: string; environment: string } => {
   const result = verifyPresence(
     staffCoords.latitude,
     staffCoords.longitude,
@@ -264,13 +302,16 @@ export const verifyAttendance = (
     threshold
   );
   
-  const accuracyBuffer = Math.min(accuracy || 0, 10); // Cap at 10m
+  const isIndoorScenario = (accuracy || 0) > 20;
+  const accuracyBuffer = Math.min(accuracy || 0, isIndoorScenario ? 20 : 10);
+  const adjustedThreshold = isIndoorScenario ? Math.max(threshold, 30) : threshold;
   
   return {
     distance: result.distance,
     isPresent: result.isPresent,
-    effectiveThreshold: threshold + accuracyBuffer,
-    method: result.method
+    effectiveThreshold: adjustedThreshold + accuracyBuffer,
+    method: result.method,
+    environment: result.environment
   };
 };
 
@@ -379,20 +420,27 @@ export const formatDistance = (meters: number): string => {
  * @returns boolean - true if present, false if absent
  */
 export const isPresent = (distance: number, accuracy: number, threshold: number = 25): boolean => {
-  // Cap accuracy buffer to prevent abuse (max 10m buffer)
-  const accuracyBuffer = Math.min(accuracy || 0, 10);
-  const effectiveThreshold = threshold + accuracyBuffer;
+  // Smart environment detection and threshold adjustment
+  const isIndoorScenario = (accuracy || 0) > 20;
+  const environment = isIndoorScenario ? 'INDOOR (Classroom)' : 'OUTDOOR';
+  
+  // Adjust thresholds based on environment
+  const adjustedThreshold = isIndoorScenario ? Math.max(threshold, 30) : threshold;
+  const accuracyBuffer = Math.min(accuracy || 0, isIndoorScenario ? 20 : 10);
+  const effectiveThreshold = adjustedThreshold + accuracyBuffer;
   const present = distance <= effectiveThreshold;
   
-  console.log('=== ENHANCED ATTENDANCE DETERMINATION ===');
+  console.log('=== SMART ATTENDANCE DETERMINATION ===');
+  console.log(`  Environment: ${environment}`);
   console.log(`  Raw distance: ${distance.toFixed(3)}m`);
   console.log(`  GPS accuracy: ±${accuracy?.toFixed(1) || 0}m`);
-  console.log(`  Base threshold: ${threshold}m (increased for GPS drift tolerance)`);
-  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (capped at 10m)`);
+  console.log(`  Base threshold: ${threshold}m`);
+  console.log(`  Adjusted threshold: ${adjustedThreshold}m (${isIndoorScenario ? 'indoor enhanced' : 'standard'})`);
+  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (${isIndoorScenario ? 'indoor: ≤20m' : 'outdoor: ≤10m'})`);
   console.log(`  Final threshold: ${effectiveThreshold.toFixed(1)}m`);
-  console.log(`  GPS drift consideration: Built-in tolerance for mobile GPS variations`);
+  console.log(`  ${isIndoorScenario ? '🏢 Indoor GPS compensation active' : '🌍 Standard outdoor GPS processing'}`);
   console.log(`  Result: ${present ? 'PRESENT ✅' : 'ABSENT ❌'}`);
-  console.log('=== END ENHANCED DETERMINATION ===');
+  console.log('=== END SMART DETERMINATION ===');
   
   return present;
 };
@@ -405,12 +453,17 @@ export const isPresent = (distance: number, accuracy: number, threshold: number 
  * @returns boolean
  */
 export const isDistanceReasonable = (distance: number, accuracy: number): boolean => {
-  // Enhanced GPS accuracy validation
-  if (accuracy > 15) {
+  // Smart GPS accuracy validation based on environment
+  const isIndoorScenario = accuracy > 20;
+  const threshold = isIndoorScenario ? 25 : 15; // 25m for indoor, 15m for outdoor
+  const environment = isIndoorScenario ? 'INDOOR' : 'OUTDOOR';
+  
+  if (accuracy > threshold) {
     console.warn('❌ GPS accuracy rejected:', {
       accuracy: accuracy.toFixed(1) + 'm',
-      threshold: '15m',
-      reason: 'Accuracy too poor for reliable attendance'
+      threshold: threshold + 'm',
+      environment: environment,
+      reason: `Accuracy too poor for reliable ${environment.toLowerCase()} attendance`
     });
     return false;
   }
@@ -433,20 +486,45 @@ export const isDistanceReasonable = (distance: number, accuracy: number): boolea
     });
   }
   
-  // Warn about moderate accuracy (still acceptable but not ideal)
-  if (accuracy > 5 && accuracy <= 15) {
-    console.log('⚠️ Moderate GPS accuracy:', {
-      accuracy: accuracy.toFixed(1) + 'm',
-      note: 'Acceptable but consider moving to better GPS signal area'
-    });
+  // Environment-specific accuracy warnings
+  if (isIndoorScenario) {
+    if (accuracy > 20 && accuracy <= 25) {
+      console.log('⚠️ Moderate indoor GPS accuracy:', {
+        accuracy: accuracy.toFixed(1) + 'm',
+        environment: 'INDOOR',
+        note: 'Acceptable for classroom use, but consider moving near windows if possible'
+      });
+    }
+  } else {
+    if (accuracy > 5 && accuracy <= 15) {
+      console.log('⚠️ Moderate outdoor GPS accuracy:', {
+        accuracy: accuracy.toFixed(1) + 'm',
+        environment: 'OUTDOOR', 
+        note: 'Acceptable but consider moving to clearer sky view'
+      });
+    }
   }
   
-  console.log('✅ Distance and GPS validation passed:', {
+  // Environment-specific accuracy grading
+  let accuracyGrade: string;
+  if (isIndoorScenario) {
+    accuracyGrade = accuracy <= 15 ? 'Excellent (Indoor)' : 
+                   accuracy <= 25 ? 'Good (Indoor)' : 
+                   accuracy <= 40 ? 'Acceptable (Indoor)' : 'Poor (Indoor)';
+  } else {
+    accuracyGrade = accuracy <= 5 ? 'Excellent (Outdoor)' : 
+                   accuracy <= 10 ? 'Good (Outdoor)' : 
+                   accuracy <= 15 ? 'Acceptable (Outdoor)' : 'Poor (Outdoor)';
+  }
+  
+  console.log('✅ Smart GPS validation passed:', {
     distance: distance.toFixed(3) + 'm',
     accuracy: accuracy.toFixed(1) + 'm',
-    accuracyGrade: accuracy <= 5 ? 'Excellent' : accuracy <= 10 ? 'Good' : 'Acceptable',
-    withinAccuracyThreshold: accuracy <= 15,
-    withinDistanceRange: distance >= 0 && distance <= 500
+    environment: environment,
+    accuracyGrade: accuracyGrade,
+    withinAccuracyThreshold: accuracy <= threshold,
+    withinDistanceRange: distance >= 0 && distance <= 500,
+    indoorOptimized: isIndoorScenario
   });
   
   return true;
@@ -460,9 +538,9 @@ export const isDistanceReasonable = (distance: number, accuracy: number): boolea
  */
 export async function getPreciseLocation({
   samples = 5,
-  timeout = 7000,
-  maxAcceptableAcc = 15, // Updated to match new accuracy threshold
-  delayMs = 2000 // Increased delay for better GPS stabilization
+  timeout = 10000, // Longer timeout for indoor scenarios
+  maxAcceptableAcc = 25, // Updated to handle indoor GPS (will be dynamically adjusted)
+  delayMs = 3000 // Longer delay for indoor GPS stabilization
 }: {
   samples?: number;
   timeout?: number;
