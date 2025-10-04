@@ -15,9 +15,9 @@ export interface LocationResult extends Coordinates {
 }
 
 /**
- * CRITICAL: Get stabilized location for final year project consistency
- * Takes multiple readings and returns the most stable/accurate one
- * @returns Promise with consistent location result
+ * ENHANCED: Get high-accuracy location with GPS validation and retry
+ * Implements accuracy checking, multiple readings, and retry mechanism
+ * @returns Promise with validated location result
  */
 export const getCurrentLocation = (): Promise<LocationResult> => {
   return new Promise(async (resolve, reject) => {
@@ -26,83 +26,110 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
       return;
     }
 
-    console.log('🎯 GETTING STABILIZED LOCATION FOR PROJECT CONSISTENCY...');
+    console.log('🎯 GETTING HIGH-ACCURACY LOCATION WITH GPS VALIDATION...');
 
-    // Ultra-high precision options for project accuracy
+    // High precision options with reasonable timeout
     const options: PositionOptions = {
       enableHighAccuracy: true,
-      timeout: 30000, // Extended timeout for best accuracy
+      timeout: 15000, // Reasonable timeout for mobile devices
       maximumAge: 0, // Never use cached position
     };
 
+    const MAX_ACCURACY_THRESHOLD = 15; // Reject readings worse than 15m
+    const MAX_ATTEMPTS = 5;
+    const DELAY_BETWEEN_READINGS = 2000; // 2 seconds between readings
+
     try {
-      // Take multiple readings for consistency
-      const readings: LocationResult[] = [];
-      const maxReadings = 3;
+      const validReadings: LocationResult[] = [];
+      let attempts = 0;
 
-      for (let i = 0; i < maxReadings; i++) {
-        console.log(`📍 Taking reading ${i + 1}/${maxReadings}...`);
+      while (validReadings.length < 3 && attempts < MAX_ATTEMPTS) {
+        attempts++;
+        console.log(`📍 Attempt ${attempts}/${MAX_ATTEMPTS} - Getting GPS reading...`);
         
-        const reading = await new Promise<LocationResult>((resolveReading, rejectReading) => {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              resolveReading({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                accuracy: position.coords.accuracy,
-                timestamp: position.timestamp,
-              });
-            },
-            rejectReading,
-            options
-          );
-        });
+        try {
+          const reading = await new Promise<LocationResult>((resolveReading, rejectReading) => {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const result = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                  accuracy: position.coords.accuracy,
+                  timestamp: position.timestamp,
+                };
+                
+                console.log(`  Reading: ${result.latitude.toFixed(8)}, ${result.longitude.toFixed(8)} (±${result.accuracy.toFixed(1)}m)`);
+                
+                // Validate GPS accuracy
+                if (result.accuracy > MAX_ACCURACY_THRESHOLD) {
+                  console.log(`  ❌ Rejected: Poor accuracy (${result.accuracy.toFixed(1)}m > ${MAX_ACCURACY_THRESHOLD}m)`);
+                  rejectReading(new Error(`GPS accuracy too poor: ${result.accuracy.toFixed(1)}m`));
+                  return;
+                }
+                
+                console.log(`  ✅ Accepted: Good accuracy (${result.accuracy.toFixed(1)}m ≤ ${MAX_ACCURACY_THRESHOLD}m)`);
+                resolveReading(result);
+              },
+              rejectReading,
+              options
+            );
+          });
 
-        readings.push(reading);
-        console.log(`  Reading ${i + 1}: ${reading.latitude.toFixed(8)}, ${reading.longitude.toFixed(8)} (±${reading.accuracy.toFixed(1)}m)`);
+          validReadings.push(reading);
+          
+        } catch (readingError) {
+          console.log(`  ⚠️ Reading ${attempts} failed:`, (readingError as Error).message);
+          
+          // If we have some valid readings and this is not the last attempt, continue
+          if (validReadings.length === 0 && attempts === MAX_ATTEMPTS) {
+            throw readingError;
+          }
+        }
 
-        // Small delay between readings for GPS stabilization
-        if (i < maxReadings - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        // Delay between readings for GPS stabilization
+        if (validReadings.length < 3 && attempts < MAX_ATTEMPTS) {
+          console.log(`  ⏳ Waiting ${DELAY_BETWEEN_READINGS/1000}s for GPS stabilization...`);
+          await new Promise(resolve => setTimeout(resolve, DELAY_BETWEEN_READINGS));
         }
       }
 
-      // Find the most accurate reading (smallest accuracy value)
-      const bestReading = readings.reduce((best, current) => 
-        current.accuracy < best.accuracy ? current : best
-      );
+      if (validReadings.length === 0) {
+        throw new Error(`No valid GPS readings obtained after ${attempts} attempts. All readings had accuracy > ${MAX_ACCURACY_THRESHOLD}m`);
+      }
 
-      // Calculate coordinate stability (how much readings vary)
-      const latitudes = readings.map(r => r.latitude);
-      const longitudes = readings.map(r => r.longitude);
+      console.log(`📊 GPS VALIDATION RESULTS:`);
+      console.log(`  Valid readings collected: ${validReadings.length}/${attempts}`);
+      console.log(`  Accuracy threshold: ≤${MAX_ACCURACY_THRESHOLD}m`);
+
+      // Use weighted average based on accuracy (better accuracy = higher weight)
+      const weights = validReadings.map(r => 1 / r.accuracy);
+      const totalWeight = weights.reduce((sum, w) => sum + w, 0);
       
-      const latRange = Math.max(...latitudes) - Math.min(...latitudes);
-      const lonRange = Math.max(...longitudes) - Math.min(...longitudes);
-      const coordinateStability = Math.max(latRange, lonRange);
-
-      console.log('📊 LOCATION STABILITY ANALYSIS:');
-      console.log(`  Best accuracy: ±${bestReading.accuracy.toFixed(1)}m`);
-      console.log(`  Coordinate stability: ${(coordinateStability * 111000).toFixed(1)}m variation`);
-      console.log(`  Selected coordinates: ${bestReading.latitude.toFixed(8)}, ${bestReading.longitude.toFixed(8)}`);
+      const avgLatitude = validReadings.reduce((sum, r, i) => sum + (r.latitude * weights[i]), 0) / totalWeight;
+      const avgLongitude = validReadings.reduce((sum, r, i) => sum + (r.longitude * weights[i]), 0) / totalWeight;
+      const avgAccuracy = validReadings.reduce((sum, r) => sum + r.accuracy, 0) / validReadings.length;
+      
+      // Find the most recent timestamp
+      const latestTimestamp = Math.max(...validReadings.map(r => r.timestamp));
 
       // Stabilize coordinates to 6 decimal places for consistency
-      // 6 decimal places = ~0.11m precision, good for project consistency
       const stabilizedResult = {
-        latitude: Math.round(bestReading.latitude * 1000000) / 1000000,
-        longitude: Math.round(bestReading.longitude * 1000000) / 1000000,
-        accuracy: bestReading.accuracy,
-        timestamp: bestReading.timestamp,
+        latitude: Math.round(avgLatitude * 1000000) / 1000000,
+        longitude: Math.round(avgLongitude * 1000000) / 1000000,
+        accuracy: Math.round(avgAccuracy * 10) / 10,
+        timestamp: latestTimestamp,
       };
 
-      console.log('✅ STABILIZED COORDINATES FOR PROJECT CONSISTENCY:');
-      console.log(`  Final coordinates: ${stabilizedResult.latitude.toFixed(6)}, ${stabilizedResult.longitude.toFixed(6)}`);
-      console.log(`  Coordinate precision: 6 decimal places (~0.11m resolution)`);
-      console.log(`  This ensures same location gives same distance every time`);
+      console.log('✅ FINAL VALIDATED LOCATION:');
+      console.log(`  Coordinates: ${stabilizedResult.latitude.toFixed(6)}, ${stabilizedResult.longitude.toFixed(6)}`);
+      console.log(`  Average accuracy: ±${stabilizedResult.accuracy}m`);
+      console.log(`  Readings used: ${validReadings.length} (weighted average)`);
+      console.log(`  GPS validation: PASSED (all readings ≤${MAX_ACCURACY_THRESHOLD}m)`);
 
       resolve(stabilizedResult);
 
     } catch (error) {
-      console.error('❌ Stabilized location acquisition failed:', error);
+      console.error('❌ Enhanced location acquisition failed:', error);
       handleLocationError(error as GeolocationPositionError);
       reject(error);
     }
@@ -110,13 +137,14 @@ export const getCurrentLocation = (): Promise<LocationResult> => {
 };
 
 /**
- * Verify presence using localDistance + accuracy buffer - PRODUCTION OPTIMIZED
+ * ENHANCED: Verify presence with GPS drift tolerance and smart distance calculation
+ * Uses appropriate distance formula based on range and includes GPS accuracy buffer
  * @param staffLat Staff latitude
  * @param staffLon Staff longitude
  * @param studentLat Student latitude
  * @param studentLon Student longitude
  * @param studentAccuracy Student GPS accuracy in meters
- * @param threshold Distance threshold in meters (default: 11m)
+ * @param threshold Distance threshold in meters (default: 25m for GPS drift tolerance)
  * @returns Object with distance, effective distance, and presence status
  */
 export function verifyPresence(
@@ -125,44 +153,108 @@ export function verifyPresence(
   studentLat: number,
   studentLon: number,
   studentAccuracy: number,
-  threshold = 11
-): { distance: number; effective: number; isPresent: boolean } {
-  const distance = localDistanceMeters(staffLat, staffLon, studentLat, studentLon);
+  threshold = 25 // Increased from 11m to 25m for GPS drift tolerance
+): { distance: number; effective: number; isPresent: boolean; method: string } {
+  // Choose distance calculation method based on expected range
+  const roughDistance = Math.abs(staffLat - studentLat) + Math.abs(staffLon - studentLon);
+  const roughMeters = roughDistance * 111000; // Approximate meters
   
-  // Effective distance after subtracting reported GPS uncertainty
-  const effective = +(distance - (studentAccuracy || 0));
+  let distance: number;
+  let method: string;
   
-  // Mark present if measured distance is <= threshold + accuracy (conservative)
-  const isPresent = distance <= threshold + (studentAccuracy || 0);
+  if (roughMeters < 30) {
+    // Use local Euclidean approximation for small distances (<30m)
+    // More stable and less sensitive to GPS rounding errors
+    distance = euclideanDistanceMeters(staffLat, staffLon, studentLat, studentLon);
+    method = 'Euclidean (optimized for <30m)';
+  } else {
+    // Use equirectangular projection for larger distances
+    distance = localDistanceMeters(staffLat, staffLon, studentLat, studentLon);
+    method = 'Equirectangular (standard)';
+  }
   
-  console.log('🎯 ATTENDANCE VERIFICATION');
-  console.log(`  Distance: ${distance}m`);
-  console.log(`  GPS Accuracy: ±${studentAccuracy}m`);
-  console.log(`  Effective Distance: ${effective}m (distance - accuracy)`);
-  console.log(`  Threshold: ${threshold}m + ${studentAccuracy}m = ${threshold + studentAccuracy}m`);
+  // Effective distance after subtracting GPS uncertainty
+  const effective = Math.max(0, distance - (studentAccuracy || 0));
+  
+  // Conservative approach: Present if distance <= threshold + accuracy buffer
+  const accuracyBuffer = Math.min(studentAccuracy || 0, 10); // Cap accuracy buffer at 10m
+  const effectiveThreshold = threshold + accuracyBuffer;
+  const isPresent = distance <= effectiveThreshold;
+  
+  console.log('🎯 ENHANCED ATTENDANCE VERIFICATION');
+  console.log(`  Calculation method: ${method}`);
+  console.log(`  Raw distance: ${distance.toFixed(3)}m`);
+  console.log(`  GPS accuracy: ±${studentAccuracy?.toFixed(1) || 0}m`);
+  console.log(`  Effective distance: ${effective.toFixed(3)}m (distance - accuracy)`);
+  console.log(`  Base threshold: ${threshold}m`);
+  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (capped at 10m)`);
+  console.log(`  Final threshold: ${effectiveThreshold.toFixed(1)}m`);
   console.log(`  Result: ${isPresent ? 'PRESENT ✅' : 'ABSENT ❌'}`);
   
   return { 
     distance: +distance.toFixed(3), 
     effective: +effective.toFixed(3), 
-    isPresent 
+    isPresent,
+    method
   };
 }
 
 /**
+ * Euclidean distance approximation for small distances (<30m)
+ * More numerically stable than spherical calculations for classroom ranges
+ * @param lat1 Latitude of first point
+ * @param lon1 Longitude of first point
+ * @param lat2 Latitude of second point
+ * @param lon2 Longitude of second point
+ * @returns Distance in meters
+ */
+export function euclideanDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  // Validate coordinates
+  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) {
+    throw new Error('Invalid coordinates provided - null or undefined values');
+  }
+
+  if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90) {
+    throw new Error(`Invalid latitude values: lat1=${lat1}, lat2=${lat2}`);
+  }
+  if (Math.abs(lon1) > 180 || Math.abs(lon2) > 180) {
+    throw new Error(`Invalid longitude values: lon1=${lon1}, lon2=${lon2}`);
+  }
+
+  // Check for identical coordinates
+  if (lat1 === lat2 && lon1 === lon2) {
+    return 0.000;
+  }
+
+  // Convert to meters using local approximation
+  // At typical latitudes, 1 degree ≈ 111km
+  const avgLat = (lat1 + lat2) / 2;
+  const latMetersPerDegree = 111000; // meters per degree latitude
+  const lonMetersPerDegree = 111000 * Math.cos(avgLat * Math.PI / 180); // adjusted for longitude
+  
+  const deltaLatMeters = (lat2 - lat1) * latMetersPerDegree;
+  const deltaLonMeters = (lon2 - lon1) * lonMetersPerDegree;
+  
+  const distance = Math.sqrt(deltaLatMeters * deltaLatMeters + deltaLonMeters * deltaLonMeters);
+  
+  return +distance.toFixed(3);
+}
+
+/**
  * Legacy verifyAttendance function - maintains backward compatibility
+ * Updated with enhanced GPS drift tolerance
  * @param staffCoords Staff coordinates
  * @param studentCoords Student coordinates  
  * @param accuracy GPS accuracy in meters
- * @param threshold Distance threshold in meters (default: 11m)
+ * @param threshold Distance threshold in meters (default: 25m for GPS drift tolerance)
  * @returns Object with distance and presence status
  */
 export const verifyAttendance = (
   staffCoords: Coordinates,
   studentCoords: Coordinates,
   accuracy: number,
-  threshold: number = 11
-): { distance: number; isPresent: boolean; effectiveThreshold: number } => {
+  threshold: number = 25 // Increased from 11m to 25m
+): { distance: number; isPresent: boolean; effectiveThreshold: number; method: string } => {
   const result = verifyPresence(
     staffCoords.latitude,
     staffCoords.longitude,
@@ -172,10 +264,13 @@ export const verifyAttendance = (
     threshold
   );
   
+  const accuracyBuffer = Math.min(accuracy || 0, 10); // Cap at 10m
+  
   return {
     distance: result.distance,
     isPresent: result.isPresent,
-    effectiveThreshold: threshold + accuracy
+    effectiveThreshold: threshold + accuracyBuffer,
+    method: result.method
   };
 };
 
@@ -276,52 +371,82 @@ export const formatDistance = (meters: number): string => {
 };
 
 /**
- * Check if student should be marked present based on distance and GPS accuracy
- * CORRECTED: Uses distance + accuracy buffer for attendance determination
+ * ENHANCED: Check if student should be marked present with GPS drift tolerance
+ * Uses conservative approach with accuracy buffer and reasonable thresholds
  * @param distance Calculated distance in meters
  * @param accuracy GPS accuracy in meters
- * @param threshold Distance threshold in meters (default: 10m)
+ * @param threshold Distance threshold in meters (default: 25m for GPS drift tolerance)
  * @returns boolean - true if present, false if absent
  */
-export const isPresent = (distance: number, accuracy: number, threshold: number = 10): boolean => {
-  const effectiveThreshold = threshold + accuracy;
+export const isPresent = (distance: number, accuracy: number, threshold: number = 25): boolean => {
+  // Cap accuracy buffer to prevent abuse (max 10m buffer)
+  const accuracyBuffer = Math.min(accuracy || 0, 10);
+  const effectiveThreshold = threshold + accuracyBuffer;
   const present = distance <= effectiveThreshold;
   
-  console.log('=== ATTENDANCE DETERMINATION ===');
-  console.log(`  Distance: ${distance.toFixed(3)}m`);
-  console.log(`  GPS Accuracy: ±${accuracy.toFixed(1)}m`);
-  console.log(`  Base Threshold: ${threshold}m`);
-  console.log(`  Effective Threshold: ${effectiveThreshold.toFixed(1)}m (threshold + accuracy)`);
+  console.log('=== ENHANCED ATTENDANCE DETERMINATION ===');
+  console.log(`  Raw distance: ${distance.toFixed(3)}m`);
+  console.log(`  GPS accuracy: ±${accuracy?.toFixed(1) || 0}m`);
+  console.log(`  Base threshold: ${threshold}m (increased for GPS drift tolerance)`);
+  console.log(`  Accuracy buffer: +${accuracyBuffer.toFixed(1)}m (capped at 10m)`);
+  console.log(`  Final threshold: ${effectiveThreshold.toFixed(1)}m`);
+  console.log(`  GPS drift consideration: Built-in tolerance for mobile GPS variations`);
   console.log(`  Result: ${present ? 'PRESENT ✅' : 'ABSENT ❌'}`);
-  console.log('=== END DETERMINATION ===');
+  console.log('=== END ENHANCED DETERMINATION ===');
   
   return present;
 };
 
 /**
- * Validate if distance calculation is reasonable
+ * ENHANCED: Validate if distance calculation and GPS reading are reasonable
+ * Implements stricter accuracy validation and comprehensive checks
  * @param distance Distance in meters
  * @param accuracy GPS accuracy in meters
  * @returns boolean
  */
 export const isDistanceReasonable = (distance: number, accuracy: number): boolean => {
-  // Reject readings with very poor accuracy
-  if (accuracy > 100) {
-    console.warn('GPS accuracy too poor, rejecting reading:', accuracy, 'meters');
+  // Enhanced GPS accuracy validation
+  if (accuracy > 15) {
+    console.warn('❌ GPS accuracy rejected:', {
+      accuracy: accuracy.toFixed(1) + 'm',
+      threshold: '15m',
+      reason: 'Accuracy too poor for reliable attendance'
+    });
     return false;
   }
   
   // Distance should be reasonable (not negative, not extremely large)
-  if (distance < 0 || distance > 1000) {
-    console.warn('Unreasonable distance for classroom:', distance, 'meters');
+  if (distance < 0 || distance > 500) {
+    console.warn('❌ Distance rejected:', {
+      distance: distance.toFixed(3) + 'm',
+      range: '0-500m',
+      reason: 'Distance outside reasonable classroom range'
+    });
     return false;
   }
   
-  console.log('Distance calculation validated:', {
-    distance: distance.toFixed(3),
-    accuracy: accuracy.toFixed(1),
-    withinAccuracyThreshold: accuracy <= 100,
-    withinDistanceRange: distance >= 0 && distance <= 1000
+  // Additional validation for very small distances (potential GPS noise)
+  if (distance < 0.001) {
+    console.log('ℹ️ Very small distance detected:', {
+      distance: distance.toFixed(6) + 'm',
+      note: 'Likely same device or GPS noise'
+    });
+  }
+  
+  // Warn about moderate accuracy (still acceptable but not ideal)
+  if (accuracy > 5 && accuracy <= 15) {
+    console.log('⚠️ Moderate GPS accuracy:', {
+      accuracy: accuracy.toFixed(1) + 'm',
+      note: 'Acceptable but consider moving to better GPS signal area'
+    });
+  }
+  
+  console.log('✅ Distance and GPS validation passed:', {
+    distance: distance.toFixed(3) + 'm',
+    accuracy: accuracy.toFixed(1) + 'm',
+    accuracyGrade: accuracy <= 5 ? 'Excellent' : accuracy <= 10 ? 'Good' : 'Acceptable',
+    withinAccuracyThreshold: accuracy <= 15,
+    withinDistanceRange: distance >= 0 && distance <= 500
   });
   
   return true;
@@ -336,8 +461,8 @@ export const isDistanceReasonable = (distance: number, accuracy: number): boolea
 export async function getPreciseLocation({
   samples = 5,
   timeout = 7000,
-  maxAcceptableAcc = 150,
-  delayMs = 300
+  maxAcceptableAcc = 15, // Updated to match new accuracy threshold
+  delayMs = 2000 // Increased delay for better GPS stabilization
 }: {
   samples?: number;
   timeout?: number;
